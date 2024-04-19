@@ -1,11 +1,51 @@
 ---
 title: "Data Cleaning and Aggregation"
 output: github_document
-date: "2024-04-19"
+date: "Last updated: April 19, 2024"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## 
+## Required Packages
+
+```{r}
+library(tidyverse)
+library(ggpubr)
+```
+## Data Loading
+
+Because the shape-file data we will be using is local to the `tidyverse` collection, we only need to load in the two remaining data sources.
+
+Here, we assign the dietary-footprint and university-enrollment data as objects within our environment by reading in the two data files that were previously loaded into the `parent-files` folder of our repository.
+
+They include the publication data from Kim and colleagues (2021), which was retrieved via the Digital Commons using this [project link](https://data.mendeley.com/datasets/g8n8w8snmj/3), and the user-generated indicator report from the [EdStats database](https://databank.worldbank.org/reports.aspx?source=Education%20Statistics). 
+
+
+```{r}
+dietary_footprint_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
+university_enrollment_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/education_data_by_country.csv")
+```
+
+## Adjusting the Shape-File Data
+
+Before we can consolidate the relevant variables from the two parent versions of the data files loaded in above, we will first need to update the shape-file data local to the `maps` package within the `tidyverse` collection. 
+
+```{r}
+shapefile_data <- map_data("world")
+shapefile_data %>% head(6)
+```
+
+More specifically, we will need to align the directory of nation-states in this package to the conventions outlined by the [International Organizaation for Standardization (ISO)](https://www.iso.org/iso-3166-country-codes.html). 
+
+```{r}
+impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
+dietary_footprint_data %>% head(6)
+```
+
+
+```{r}
+write.csv(impact_data,"~/github/university-impact-model/data/model-output/impact-data.csv")
+```
+
