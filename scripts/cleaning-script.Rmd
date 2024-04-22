@@ -8,7 +8,7 @@ date: "Last updated: April 19, 2024"
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Required Packages
+## Package Loading
 
 ```{r}
 library(tidyverse)
@@ -16,28 +16,57 @@ library(ggpubr)
 ```
 ## Data Loading
 
-Because the shape-file data we will be using is local to the `tidyverse` collection, we only need to load in the two remaining data sources.
+There are three principal data sources that we will be using to populate our impact model:
 
-Here, we assign the dietary-footprint and university-enrollment data as objects within our environment by reading in the two data files that were previously loaded into the `parent-files` folder of our repository.
+* Shape-File Data
+* Dietary-Footprint Data
+* University-Enrollment Data
 
-They include the publication data from Kim and colleagues (2021), which was retrieved via the Digital Commons using this [project link](https://data.mendeley.com/datasets/g8n8w8snmj/3), and the user-generated indicator report from the [EdStats database](https://databank.worldbank.org/reports.aspx?source=Education%20Statistics). 
+The shape-file data we will be using is local to the `maps` package in the `tidyverse` collection. As such, we can reference this vector data and write the assigned object into the `parent-files` folder of our repository, using the following:
 
+```{r}
+shapefile_data <- map_data("world")
+write.csv(shapefile_data,file="/Users/kenjinchang/github/university-impact-model/data/parent-files/shapefile_data_by_country.csv")
+```
+
+With this step complete, we  now move on to loading in the remaining two data sources required to generate our impact model. These include (1) the publication data from "Country-specific dietary shifts to mitigate climate and water crises" (Kim et al., 2020), which was retrieved via the Digital Commons using this [project link](https://data.mendeley.com/datasets/g8n8w8snmj/3), and (2) the customized indicator report generated on April 19, 2024 from the [EdStats database](https://databank.worldbank.org/reports.aspx?source=Education%20Statistics). Both were 
 
 ```{r}
 dietary_footprint_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
 university_enrollment_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/education_data_by_country.csv")
 ```
 
+Before we can consolidate the relevant information from these data sources into a single matrix, we will first need to make a series of adjustments in preparation for our spatial join. In the following sections, we document each of these steps, their justifications, and the code chunks used to perform the transformations.
+
 ## Adjusting the Shape-File Data
 
-Before we can consolidate the relevant variables from the two parent versions of the data files loaded in above, we will first need to update the shape-file data local to the `maps` package within the `tidyverse` collection. 
+Because the directory of nation-states used in this data file does not correspond with the conventions outlined by the [International Organizaation for Standardization (ISO)](https://www.iso.org/iso-3166-country-codes.html), we will need to make a few changes to make sure the countries are represented using the same names and boundaries across the three data sources.
+
+Using the instructions outlined by Haslam in his 2021 [RPubs entry](https://rpubs.com/Thom_JH/798825), we begin by addressing what he refers to as the "easy cases."
+
+More specifically, these refer to the 13 instances where the names of the nation-states listed under the `region` variable in the `maps` package are incongruent with the names of the nation-states listed under the `country` variable in the `Gapminder` dataset, which does synchronized with the latest ISO conventions. 
 
 ```{r}
-shapefile_data <- map_data("world")
-shapefile_data %>% head(6)
+shapefile_data <- shapefile_data %>% 
+  rename(country=region) %>%
+  mutate(country=case_when(country=="Macedonia"~"North Macedonia",
+                           country=="Ivory Coast"~"Cote d'Ivoire",
+                           country=="Democratic Republic of the Congo"~"Congo, Dem. Rep.",
+                           country=="Republic of Congo"~"Congo, Rep.",
+                           country=="UK"~"United Kingdom",
+                           country=="USA"~"United States",
+                           country=="Laos"~"Lao",
+                           country=="Slovakia"~"Slovak Republic",
+                           country=="Saint Lucia"~"St. Lucia",
+                           country=="Kyrgyzstan"~"Krygyz Republic",
+                           country=="Micronesia"~"Micronesia, Fed. Sts.",
+                           country=="Swaziland"~"Eswatini",
+                           country=="Virgin Islands"~"Virgin Islands (U.S.)",
+                        TRUE~country))
 ```
 
-More specifically, we will need to align the directory of nation-states in this package to the conventions outlined by the [International Organizaation for Standardization (ISO)](https://www.iso.org/iso-3166-country-codes.html). 
+For the next group of cases, which Haslam refers to as the "island nations," 
+
 
 ```{r}
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
