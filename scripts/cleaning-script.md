@@ -1,6 +1,6 @@
 Data Cleaning and Aggregation
 ================
-Last updated: April 19, 2024
+Last updated: April 29, 2024
 
 ## Package Loading
 
@@ -23,63 +23,65 @@ library(ggpubr)
 
 ## Data Loading
 
-There are three principal data sources that we will be using to populate
-our impact model:
+There are three principal data inputs needed to populate our impact
+model:
 
 - Shape-File Data
 - Dietary-Footprint Data
 - University-Enrollment Data
 
-The shape-file data we will be using is local to the `maps` package in
-the `tidyverse` collection. As such, we can reference this vector data
-and write the assigned object into the `parent-files` folder of our
-repository, using the following:
+The shape-file data we will be using is local to the `maps` package
+within the `tidyverse` collection. As such, we can assign the
+corresponding vector as an object within our environment and write it
+into the `parent-files` folder of our repository, using the following:
 
 ``` r
 shapefile_data <- map_data("world")
 write.csv(shapefile_data,file="/Users/kenjinchang/github/university-impact-model/data/parent-files/shapefile_data_by_country.csv")
 ```
 
-With this step complete, we now move on to loading in the remaining two
-data sources required to generate our impact model. These include (1)
-the publication data from “Country-specific dietary shifts to mitigate
-climate and water crises” (Kim et al., 2020), which was retrieved via
-the Digital Commons using this [project
-link](https://data.mendeley.com/datasets/g8n8w8snmj/3), and (2) the
-customized indicator report generated on April 19, 2024 from the
-[EdStats
+With this step complete, we can now move on to loading in the remaining
+two data inputs. These include (1) the publication data from
+“Country-specific dietary shifts to mitigate climate and water crises”
+(Kim et al., 2020), which was retrieved via the Digital Commons using
+this [project link](https://data.mendeley.com/datasets/g8n8w8snmj/3),
+and (2) the customized indicator report generated on April 19, 2024 from
+the [EdStats
 database](https://databank.worldbank.org/reports.aspx?source=Education%20Statistics).
-Both were
 
 ``` r
 dietary_footprint_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
 university_enrollment_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/education_data_by_country.csv")
 ```
 
-Before we can consolidate the relevant information from these data
-sources into a single matrix, we will first need to make a series of
+Before we can consolidate the relevant information from these individual
+data inputs into a single matrix, we will first need to make a series of
 adjustments in preparation for our spatial join. In the following
-sections, we document each of these steps, their justifications, and the
-code chunks used to perform the transformations.
+sections, we document each of these steps, the motivations for doing
+them, and the code chunks used to perform the described transformations.
 
 ## Adjusting the Shape-File Data
 
-Because the directory of nation-states used in this data file does not
-correspond with the conventions outlined by the [International
-Organizaation for Standardization
-(ISO)](https://www.iso.org/iso-3166-country-codes.html), we will need to
-make a few changes to make sure the countries are represented using the
-same names and boundaries across the three data sources.
+Because the directory of nation-states used in the `maps` package does
+not correspond with the country designations used in the remaining two
+data inputs, we will need to adjust how these areas are geographically
+and politically represented within our shape-file data.
 
-Using the instructions outlined by Haslam in his 2021 [RPubs
-entry](https://rpubs.com/Thom_JH/798825), we begin by addressing what he
-refers to as the “easy cases.”
+To ensure consistency in the naming conventions and spatial boundaries
+adopted across three leveraged data sources, we will follow the
+guidelines outlined by the [International Organizaation for
+Standardization (ISO)](https://www.iso.org/iso-3166-country-codes.html).
 
-More specifically, these refer to the 13 instances where the names of
-the nation-states listed under the `region` variable in the `maps`
-package are incongruent with the names of the nation-states listed under
-the `country` variable in the `Gapminder` dataset, which does
-synchronized with the latest ISO conventions.
+Using the instructions provided by Thomas Haslam in his 2021 [RPubs
+entry](https://rpubs.com/Thom_JH/798825), we will begin this process by
+addressing what he refers to as the “easy cases” first.
+
+These refer to the 13 instances where the names of the nation-states
+listed under the `region` variable in the `maps` package are misaligned
+with the names of the nation-states listed under the `country` variable
+in the `Gapminder` dataset—a commonly used data source that happens to
+be synchronized with [ISO-3166 naming
+standards](https://www.iso.org/iso-3166-country-codes.html).
 
 ``` r
 shapefile_data <- shapefile_data %>% 
@@ -101,7 +103,104 @@ shapefile_data <- shapefile_data %>%
 ```
 
 For the next group of cases, which Haslam refers to as the “island
-nations,”
+nations,” we will need to aggregate the previously grouped regions of
+Antigua and Barbuda, St. Kitts and Nevi, Trinidad and Tobago, and
+St. Vincent and the Grenadines using the following:
+
+``` r
+island_nations <- c("Antigua","Barbuda","Nevis", 
+                 "Saint Kitts","Trinidad",
+                 "Tobago","Grenadines","Saint Vincent")
+island_nations_match <- shapefile_data %>% 
+  filter(country %in% island_nations)
+island_nations_match %>% distinct(country)
+```
+
+    ##         country
+    ## 1       Antigua
+    ## 2       Barbuda
+    ## 3         Nevis
+    ## 4   Saint Kitts
+    ## 5      Trinidad
+    ## 6        Tobago
+    ## 7    Grenadines
+    ## 8 Saint Vincent
+
+``` r
+ant_bar <- c(137,138 )
+kit_nev <- c(930,931)
+tri_tog <- c(1425,1426)
+vin_gre <- c(1575,1576,1577)
+island_nation_names <- c("Antigua and Barbuda","St. Kitts and Nevis","Trinidad and Tobago","St. Vincent and the Grenadines")
+island_nations_match <- island_nations_match %>% 
+  mutate(country=case_when(group %in% ant_bar~"Antigua and Barbuda",
+                           group %in% kit_nev~"St. Kitts and Nevis",
+                           group %in% tri_tog~"Trinidad and Tobago",
+                           group %in% vin_gre~"St. Vincent and the Grenadines")) %>% 
+  tibble()
+island_nations_match %>%
+  distinct(country) 
+```
+
+    ## # A tibble: 4 × 1
+    ##   country                       
+    ##   <chr>                         
+    ## 1 Antigua and Barbuda           
+    ## 2 St. Kitts and Nevis           
+    ## 3 Trinidad and Tobago           
+    ## 4 St. Vincent and the Grenadines
+
+``` r
+shapefile_data <- shapefile_data %>%
+  filter(!country %in% island_nation_names)
+shapefile_data <- shapefile_data %>% 
+  bind_rows(island_nations_match) %>%
+  arrange(country) %>%
+  tibble()
+```
+
+Now, we move on to the final two cases pertinent to our impact model.
+Haslam refers to these instances as “subregion promotion,” and they
+invol
+
+``` r
+sra_names <- c("Hong Kong","Macao")
+hk_mc <- shapefile_data %>% 
+  filter(subregion %in% sra_names)
+hk_mc <- hk_mc %>%
+  mutate(country = case_when(subregion=="Hong Kong"~"Hong Kong, China",
+                             subregion=="Macao"~"Macao, China"))
+shapefile_data <- shapefile_data %>%
+  filter(!subregion %in% sra_names)
+shapefile_data <- shapefile_data %>% 
+  bind_rows(hk_mc) %>%
+  select(-subregion) %>% 
+  tibble()
+```
+
+With these steps complete, we can now review the countries currently
+accounted for in our shapefile data.
+
+``` r
+shapefile_data %>% distinct(country)
+```
+
+    ## # A tibble: 258 × 1
+    ##    country            
+    ##    <chr>              
+    ##  1 Afghanistan        
+    ##  2 Albania            
+    ##  3 Algeria            
+    ##  4 American Samoa     
+    ##  5 Andorra            
+    ##  6 Angola             
+    ##  7 Anguilla           
+    ##  8 Antarctica         
+    ##  9 Antigua            
+    ## 10 Antigua and Barbuda
+    ## # … with 248 more rows
+
+## Adjusting the Dietary-Footprint Data
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
