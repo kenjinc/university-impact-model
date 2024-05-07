@@ -23,30 +23,29 @@ library(ggpubr)
 
 ## Data Loading
 
-There are three principal data inputs needed to populate our impact
+There are three principal data inputs needed to generate our impact
 model:
 
 - Shape-File Data
 - Dietary-Footprint Data
 - University-Enrollment Data
 
-The shape-file data we will be using is local to the `maps` package
-within the `tidyverse` collection. As such, we can assign the
-corresponding vector as an object within our environment and write it
-into the `parent-files` folder of our repository, using the following:
+The shape-file data we will be using, which is local to the `maps`
+package within the `tidyverse` collection, can be written into the
+`parent-files` folder of our respository with the following:
 
 ``` r
 shapefile_data <- map_data("world")
 write.csv(shapefile_data,file="/Users/kenjinchang/github/university-impact-model/data/parent-files/shapefile_data_by_country.csv")
 ```
 
-With this step complete, we can now move on to loading in the remaining
-two data inputs. These include (1) the publication data from
+With the shape-file data now archived, we can move on to loading in the
+remaining two data inputs. These include (1) the publication data from
 “Country-specific dietary shifts to mitigate climate and water crises”
 (Kim et al., 2020), which was retrieved via the Digital Commons using
-this [project link](https://data.mendeley.com/datasets/g8n8w8snmj/3),
-and (2) the customized indicator report generated on April 19, 2024 from
-the [EdStats
+this [link](https://data.mendeley.com/datasets/g8n8w8snmj/3), and (2)
+the customized indicator report created on April 19, 2024 from the
+[EdStats
 database](https://databank.worldbank.org/reports.aspx?source=Education%20Statistics).
 
 ``` r
@@ -54,33 +53,33 @@ dietary_footprint_data <- read.csv("/Users/kenjinchang/github/university-impact-
 university_enrollment_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/education_data_by_country.csv")
 ```
 
-Before we can consolidate the relevant information from these individual
-data inputs into a single matrix, we will first need to make a series of
+Before synthesizing the relevant information from these individual
+inputs into a single data file, we will first need to make a series of
 adjustments in preparation for our spatial join. In the following
-sections, we document each of these steps, the motivations for doing
-them, and the code chunks used to perform the described transformations.
+sections, we document these steps, their motivations, and the code
+chunks used to transform them.
 
 ## Adjusting the Shape-File Data
 
 Because the directory of nation-states used in the `maps` package does
 not correspond with the country designations used in the remaining two
-data inputs, we will need to adjust how these areas are geographically
+data sources, we will need to adjust how these areas are geographically
 and politically represented within our shape-file data.
 
-To ensure consistency in the naming conventions and spatial boundaries
-adopted across three leveraged data sources, we will follow the
-guidelines outlined by the [International Organizaation for
+To ensure consistency in naming, as well as the spatial boundaries used
+to represent these areas, across three leveraged data sources, we will
+follow the conventions outlined by the [International Organizaation for
 Standardization (ISO)](https://www.iso.org/iso-3166-country-codes.html).
 
-Using the instructions provided by Thomas Haslam in his 2021 [RPubs
+Following the instructions provided by Thomas Haslam in his 2021 [RPubs
 entry](https://rpubs.com/Thom_JH/798825), we will begin this process by
-addressing what he refers to as the “easy cases” first.
+first addressing what he refers to as the “easy cases.”
 
-These refer to the 13 instances where the names of the nation-states
-listed under the `region` variable in the `maps` package are misaligned
-with the names of the nation-states listed under the `country` variable
-in the `Gapminder` dataset—a commonly used data source that happens to
-be synchronized with [ISO-3166 naming
+These cases refer to the 13 instances where the names of the
+nation-states listed under the `region` variable in the `maps` package
+are misaligned with the names of the nation-states listed under the
+`country` variable in the `Gapminder` dataset—a commonly used data
+source that happens to be synchronized with [ISO-3166 naming
 standards](https://www.iso.org/iso-3166-country-codes.html).
 
 ``` r
@@ -103,8 +102,8 @@ shapefile_data <- shapefile_data %>%
 ```
 
 For the next group of cases, which Haslam refers to as the “island
-nations,” we will need to aggregate the previously grouped regions of
-Antigua and Barbuda, St. Kitts and Nevi, Trinidad and Tobago, and
+nations,” we will need to aggregate the previously separated regions of
+Antigua and Barbuda, St. Kitts and Nevis, Trinidad and Tobago, and
 St. Vincent and the Grenadines using the following:
 
 ``` r
@@ -159,9 +158,19 @@ shapefile_data <- shapefile_data %>%
   tibble()
 ```
 
-Now, we move on to the final two cases pertinent to our impact model.
-Haslam refers to these instances as “subregion promotion,” and they
-invol
+Now, we move on to the final two cases pertinent to our impact model,
+which Haslam refers to as “subregion promotion.” In the case of the
+special administrative regions of Hong Kong and Macao, the `maps`
+package organizes these states as subregions within its
+country-classification scheme. While this is politically correct,
+economic and health data from these regions, as Haslam (2021) points
+out, are often collected and presented separately from that of mainland
+China.
+
+In following this practice, we therefore need to adjust this
+organizational framework to reflect our desire to treat these regions as
+country-level entities using the naming conventions prescribed by the
+ISO. We accomplish this using the following:
 
 ``` r
 sra_names <- c("Hong Kong","Macao")
@@ -179,7 +188,7 @@ shapefile_data <- shapefile_data %>%
 ```
 
 With these steps complete, we can now review the countries currently
-accounted for in our shapefile data.
+accounted for in our shape-file data.
 
 ``` r
 shapefile_data %>% distinct(country)
