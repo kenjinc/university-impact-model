@@ -211,32 +211,70 @@ shapefile_data %>% distinct(country)
 
 ## Adjusting the Dietary-Footprint Data
 
+In preparation for our spatial join, we will need to reformat the
+dietary-footprint data to suit the needs of our analysis.
+
+We’ll begin, first, by selecting the following variables for extraction:
+`country`, `diet`, `attribute`, `value`.
+
+``` r
+dietary_footprint_data <- dietary_footprint_data %>%
+  select(country,diet,attribute,value,centile_down,centile_up)
+```
+
+With this accomplished, we can now continue the wrangling process by
+pivoting the tibble to a wider format, allowing each row to correspond
+to a unique country and each column to map on to the indicator-specific
+values and centiles for each dietary pattern.
+
+``` r
+dietary_footprint_data <- dietary_footprint_data %>%
+  pivot_wider(names_from=c(diet,attribute),
+              values_from=c(value,centile_up,centile_down))
+```
+
+Now that the data is organized in this way, we can sort through the
+newly generated columns and limit the dataset to the specific
+combinations of dietary patterns and sustainability indicators that are
+appropraite for our analyses. More specifically, we want to extract the
+`kg_co2e_excl_luc`, `kg_co2e_total`, `l_blue_green_wf`, and
+`l_blue_wf_total` indicators for the baseline, meatless day, low red
+meat, no dairy, no red meat, vegetarian, and vegan diets.
+
+``` r
+dietary_footprint_data <- dietary_footprint_data %>% select(country,
+                                                            centile_down_baseline_kg_co2e_excl_luc,value_baseline_kg_co2e_excl_luc,centile_up_baseline_kg_co2e_excl_luc,centile_down_baseline_kg_co2e_total,value_baseline_kg_co2e_total,centile_up_baseline_kg_co2e_total,centile_down_baseline_l_blue_green_wf,value_baseline_l_blue_green_wf,centile_up_baseline_l_blue_green_wf,centile_down_baseline_l_blue_wf_total,value_baseline_l_blue_wf_total,centile_up_baseline_l_blue_wf_total,
+                                                            centile_down_meatless_day_kg_co2e_excl_luc,value_meatless_day_kg_co2e_excl_luc,centile_up_meatless_day_kg_co2e_excl_luc,centile_down_meatless_day_kg_co2e_total,value_meatless_day_kg_co2e_total,centile_up_meatless_day_kg_co2e_total,centile_down_meatless_day_l_blue_green_wf,value_meatless_day_l_blue_green_wf,centile_up_meatless_day_l_blue_green_wf,centile_down_meatless_day_l_blue_wf_total,value_meatless_day_l_blue_wf_total,centile_up_meatless_day_l_blue_wf_total,
+                                                            centile_down_low_red_meat_kg_co2e_excl_luc,value_low_red_meat_kg_co2e_excl_luc,centile_up_low_red_meat_kg_co2e_excl_luc,centile_down_low_red_meat_kg_co2e_total,value_low_red_meat_kg_co2e_total,centile_up_low_red_meat_kg_co2e_total,centile_down_low_red_meat_l_blue_green_wf,value_low_red_meat_l_blue_green_wf,centile_up_low_red_meat_l_blue_green_wf,centile_down_low_red_meat_l_blue_wf_total,value_low_red_meat_l_blue_wf_total,centile_up_low_red_meat_l_blue_wf_total,
+                                                            centile_down_no_dairy_kg_co2e_excl_luc,value_no_dairy_kg_co2e_excl_luc,centile_up_no_dairy_kg_co2e_excl_luc,centile_down_no_dairy_kg_co2e_total,value_no_dairy_kg_co2e_total,centile_up_no_dairy_kg_co2e_total,centile_down_no_dairy_l_blue_green_wf,value_no_dairy_l_blue_green_wf,centile_up_no_dairy_l_blue_green_wf,centile_down_no_dairy_l_blue_wf_total,value_no_dairy_l_blue_wf_total,centile_up_no_dairy_l_blue_wf_total,
+                                                            centile_down_no_red_meat_kg_co2e_excl_luc,value_no_red_meat_kg_co2e_excl_luc,centile_up_no_red_meat_kg_co2e_excl_luc,centile_down_no_red_meat_kg_co2e_total,value_no_red_meat_kg_co2e_total,centile_up_no_red_meat_kg_co2e_total,centile_down_no_red_meat_l_blue_green_wf,value_no_red_meat_l_blue_green_wf,centile_up_no_red_meat_l_blue_green_wf,centile_down_no_red_meat_l_blue_wf_total,value_no_red_meat_l_blue_wf_total,centile_up_no_red_meat_l_blue_wf_total,
+                                                            centile_down_lacto_ovo_vegetarian_kg_co2e_excl_luc,value_lacto_ovo_vegetarian_kg_co2e_excl_luc,centile_up_lacto_ovo_vegetarian_kg_co2e_excl_luc,centile_down_lacto_ovo_vegetarian_kg_co2e_total,value_lacto_ovo_vegetarian_kg_co2e_total,centile_up_lacto_ovo_vegetarian_kg_co2e_total,centile_down_lacto_ovo_vegetarian_l_blue_green_wf,value_lacto_ovo_vegetarian_l_blue_green_wf,centile_up_lacto_ovo_vegetarian_l_blue_green_wf,centile_down_lacto_ovo_vegetarian_l_blue_wf_total,value_lacto_ovo_vegetarian_l_blue_wf_total,centile_up_lacto_ovo_vegetarian_l_blue_wf_total,
+                                                            centile_down_vegan_kg_co2e_excl_luc,value_vegan_kg_co2e_excl_luc,centile_up_vegan_kg_co2e_excl_luc,centile_down_vegan_kg_co2e_total,value_vegan_kg_co2e_total,centile_up_vegan_kg_co2e_total,centile_down_vegan_l_blue_green_wf,value_vegan_l_blue_green_wf,centile_up_vegan_l_blue_green_wf,centile_down_vegan_l_blue_wf_total,value_vegan_l_blue_wf_total,centile_up_vegan_l_blue_wf_total)
+```
+
+## Adjusting the University-Enrollment Data
+
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
 dietary_footprint_data %>% head(6)
 ```
 
-    ##   country_code country      diet                 attribute centile_up
-    ## 1            1 Armenia 2/3_vegan      kg_co2_luc_feed_palm     0.0000
-    ## 2            1 Armenia 2/3_vegan       kg_co2_luc_feed_soy     0.0000
-    ## 3            1 Armenia 2/3_vegan kg_co2_luc_human_palm_soy     0.0000
-    ## 4            1 Armenia 2/3_vegan        kg_co2_luc_pasture     0.0000
-    ## 5            1 Armenia 2/3_vegan          kg_co2e_excl_luc   289.7267
-    ## 6            1 Armenia 2/3_vegan             kg_co2e_total   289.7267
-    ##         value centile_down value_baseline diff_baseline X._diff_baseline
-    ## 1   0.3180732         0.00      0.9548163 -6.367431e-01    -0.6668749579
-    ## 2  12.2508407         0.00     36.7755021 -2.452466e+01    -0.6668749579
-    ## 3   0.2436078         0.00      0.2437601 -1.523193e-04    -0.0006248737
-    ## 4   1.1439146         0.00      3.4338897 -2.289975e+00    -0.6668749579
-    ## 5 784.8360925       136.86   1604.2125238 -8.193764e+02    -0.5107655121
-    ## 6 798.7925288       136.86   1645.6204919 -8.468280e+02    -0.5145949308
-    ##   value_baseline_adj diff_baseline_adj X._diff_baseline_adj
-    ## 1          0.9542196        -0.6361464           -0.6666667
-    ## 2         36.7525221       -24.5016814           -0.6666667
-    ## 3          0.2436078         0.0000000            0.0000000
-    ## 4          3.4317439        -2.2878293           -0.6666667
-    ## 5       1603.2100936      -818.3740011           -0.5104596
-    ## 6       1644.5921870      -845.7996582           -0.5142914
+    ## # A tibble: 6 × 85
+    ##   country        centi…¹ value…² centi…³ centi…⁴ value…⁵ centi…⁶ centi…⁷ value…⁸
+    ##   <chr>            <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ## 1 Armenia          137.    1604.   289.    137.    1646.   289.   3107.   1.44e6
+    ## 2 Afghanistan       50.3    895.    60.6    50.3    898.    60.6    97.7  1.02e6
+    ## 3 Albania          125.    1952.   213.    125.    2013.   213.   1003.   1.44e6
+    ## 4 Algeria           98.6    983.   193.     98.6   1108.   193.    356.   1.30e6
+    ## 5 Antigua and B…   121.    1310.   204.    121.    1400.   204.   2791.   1.19e6
+    ## 6 Argentina         87.9   2952.   142.     87.9   3517.   142.    350.   1.02e6
+    ## # … with 76 more variables: centile_up_baseline_l_blue_green_wf <dbl>,
+    ## #   centile_down_baseline_l_blue_wf_total <dbl>,
+    ## #   value_baseline_l_blue_wf_total <dbl>,
+    ## #   centile_up_baseline_l_blue_wf_total <dbl>,
+    ## #   centile_down_meatless_day_kg_co2e_excl_luc <dbl>,
+    ## #   value_meatless_day_kg_co2e_excl_luc <dbl>,
+    ## #   centile_up_meatless_day_kg_co2e_excl_luc <dbl>, …
 
 ``` r
 write.csv(impact_data,"~/github/university-impact-model/data/model-output/impact-data.csv")
