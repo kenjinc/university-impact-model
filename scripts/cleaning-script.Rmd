@@ -36,6 +36,11 @@ dietary_footprint_data <- read.csv("/Users/kenjinchang/github/university-impact-
 university_enrollment_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/education_data_by_country.csv")
 ```
 
+
+```{r}
+climate_footprint_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
+```
+
 Before synthesizing the relevant information from these individual inputs into a single data file, we will first need to make a series of adjustments in preparation for our spatial join. In the following sections, we document these steps, their motivations, and the code chunks used to transform them.
 
 ## Adjusting the Shape-File Data
@@ -141,7 +146,7 @@ dietary_footprint_data <- dietary_footprint_data %>%
               values_from=c(value,centile_up,centile_down))
 ```
 
-Now that the data is organized in this way, we can sort through the newly generated columns and limit the dataset to the specific combinations of dietary patterns and sustainability indicators that are appropraite for our analyses. More specifically, we want to extract the `kg_co2e_excl_luc`, `kg_co2e_total`, `l_blue_green_wf`, and `l_blue_wf_total` indicators for the baseline, meatless day, low red meat, no dairy, no red meat, vegetarian, and vegan diets. 
+Now that the data is organized in this way, we can sort through the newly generated columns and limit the dataset to the specific combinations of dietary patterns and sustainability indicators that are appropraite for our analyses. More specifically, we want to extract the `kg_co2e_excl_luc`, `kg_co2e_total`, `l_blue_green_wf`, and `l_blue_wf_total` indicators for the baseline, meatless day, low red meat, no dairy, no red meat, vegetarian, and vegan diets. ### would be good to add EAT-Lancet diet.
 
 ```{r}
 dietary_footprint_data <- dietary_footprint_data %>% select(country,
@@ -153,6 +158,71 @@ dietary_footprint_data <- dietary_footprint_data %>% select(country,
                                                             centile_down_lacto_ovo_vegetarian_kg_co2e_excl_luc,value_lacto_ovo_vegetarian_kg_co2e_excl_luc,centile_up_lacto_ovo_vegetarian_kg_co2e_excl_luc,centile_down_lacto_ovo_vegetarian_kg_co2e_total,value_lacto_ovo_vegetarian_kg_co2e_total,centile_up_lacto_ovo_vegetarian_kg_co2e_total,centile_down_lacto_ovo_vegetarian_l_blue_green_wf,value_lacto_ovo_vegetarian_l_blue_green_wf,centile_up_lacto_ovo_vegetarian_l_blue_green_wf,centile_down_lacto_ovo_vegetarian_l_blue_wf_total,value_lacto_ovo_vegetarian_l_blue_wf_total,centile_up_lacto_ovo_vegetarian_l_blue_wf_total,
                                                             centile_down_vegan_kg_co2e_excl_luc,value_vegan_kg_co2e_excl_luc,centile_up_vegan_kg_co2e_excl_luc,centile_down_vegan_kg_co2e_total,value_vegan_kg_co2e_total,centile_up_vegan_kg_co2e_total,centile_down_vegan_l_blue_green_wf,value_vegan_l_blue_green_wf,centile_up_vegan_l_blue_green_wf,centile_down_vegan_l_blue_wf_total,value_vegan_l_blue_wf_total,centile_up_vegan_l_blue_wf_total)
 ```
+
+### RUNNNING THIS BACK WITH EAT-LANCET/NO WATER
+
+Here, in the interest of adding the annual per capita emissions estimates associated with the EAT-Lancet diet, we need to align the existing dietary-footprint data from Kim and colleagues (2020) with the more recently reworked data from Semba et al (2020).
+
+In order to accomplish this, we will need to make a couple of changes before joining the two datasets. The object, here, is to match the language of the two data sources, such that they resemble structure and use the same language to represent the same constructs. 
+
+The data associated with the latter publication focuses only on the total annual per capita greenhouse gas emissions (in kilograms) and represents this indicator within the `attribute` column as `per_capita_kg_co2e`. This same indicator is represented in the original source under the `attribute` column as `kg_co2e_total`.
+
+We can therefore transform the original data source from Kim and colleagues (2020) to force alignment on this convention in preparation for our join. 
+
+```{r}
+climate_footprint_data <- climate_footprint_data %>% mutate(attribute=str_replace_all(attribute,"kg_co2e_total","per_capita_kg_co2e"))
+```
+
+Now that this is complete, we can select out the relevant columns for our analyses. Because there is no centile data available in the associated data for "Adoption of the 'planetary health diet' has different impacts on countries' greenhouse gas emissions," we no longer need to extract the `centile_up` and `centile_down` columns.
+
+```{r}
+climate_footprint_data <- climate_footprint_data %>%
+  select(country_code,country,diet,attribute,value)
+```
+
+Now that the relevant columns are represented in the same way across the two dietary-footprint data sources, we can read in the companion data source and extract the relevant columns, as we did before. 
+
+```{r}
+planetary_health_emissions_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/planetary_health_emissions_by_country.csv") %>% select(country_code,country,diet,attribute,value)
+```
+
+We can see that, while the column names are the same across the two data sets, the `value` columns are represented differently, with one being represented as a character string and the other represented as a double vector. 
+
+This difference is a product of the 1,000-separating commas used in the updated dataset. To remove this, and convert the column structure, we do the following:
+
+```{r}
+planetary_health_emissions_data <- planetary_health_emissions_data %>% 
+  mutate_all(~sub(",", "", .)) %>% mutate(value=as.double(value)) %>% mutate(country_code=as.integer(country_code))
+```
+
+Before performing our bind, there are still some checks that need to be done. We know that there are 140 countries represented in `climate_footprint_data` to the 151 in `planetary_health_emissions_data`.
+
+```{r}
+climate_footprint_data %>% distinct(country) %>% count()
+```
+
+```{r}
+planetary_health_emissions_data %>% distinct(country) %>% count()
+```
+
+Using filtering joins, we can quickly find out (1) the countries that are represented in `climate_footprint_data` without a 1:1 match in `planetary_health_emissions_data`, as well as (2) the countries that are represented in `planetary_health_emissions_data` without a 1:1 match in `climate_footprint_data`.
+
+```{r}
+anti_join(climate_footprint_data,planetary_health_emissions_data,by="country") %>%
+  distinct(country)
+```
+
+
+```{r}
+anti_join(planetary_health_emissions_data,climate_footprint_data,by="country") %>% distinct(country)
+```
+
+Before binding these two data sources together, we need to first ensure that the countries are named the same
+
+```{r}
+test <- bind_rows(planetary_health_emissions_data,climate_footprint_data)
+```
+
 
 ## Adjusting the University-Enrollment Data
 
