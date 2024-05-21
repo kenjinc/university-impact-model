@@ -336,10 +336,10 @@ planetary_health_emissions_data %>% distinct(country) %>% count()
     ## 1 151
 
 Using filtering joins, we can quickly find out (1) the countries that
-are represented in `climate_footprint_data` without a 1:1 match in
-`planetary_health_emissions_data`, as well as (2) the countries that are
-represented in `planetary_health_emissions_data` without a 1:1 match in
-`climate_footprint_data`.
+are represented in `climate_footprint_data` without a one-to-one match
+in `planetary_health_emissions_data`, as well as (2) the countries that
+are represented in `planetary_health_emissions_data` without a
+one-to-one match in `climate_footprint_data`.
 
 ``` r
 anti_join(climate_footprint_data,planetary_health_emissions_data,by="country") %>%
@@ -395,14 +395,186 @@ anti_join(planetary_health_emissions_data,climate_footprint_data,by="country") %
     ## 25                          Nigeria
     ## 26                    Cote d'Ivoire
 
-Before binding these two data sources together, we need to first ensure
-that the countries are named the same
+We will first deal with the dozen cases where there are differences in
+how the countries are represented by name. More specifically, we will
+address these instances by defaulting to how the countries are
+referenced in the original data set from Kim and colleagues (2020).
 
 ``` r
-test <- bind_rows(planetary_health_emissions_data,climate_footprint_data)
+planetary_health_emissions_data <- planetary_health_emissions_data %>%
+  mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)")) %>%
+  mutate(across(country,str_replace,"United States","United States of America")) %>%
+  mutate(across(country,str_replace,"Tanzania","United Republic of Tanzania")) %>%
+  mutate(across(country,str_replace,"Taiwan","China, Taiwan Province of")) %>%
+  mutate(across(country,str_replace,"Russia","Russian Federation")) %>%
+  mutate(across(country,str_replace,"China Macao SAR","China, Macao SAR")) %>%
+  mutate(across(country,str_replace,"South Korea","Republic of Korea")) %>%
+  mutate(across(country,str_replace,"Cote d'Ivoire","CÃ´te d'Ivoire")) %>%
+  mutate(across(country,str_replace,"Iran","Iran (Islamic Republic of)")) %>%
+  mutate(across(country,str_replace,"Hong Kong SAR","China, Hong Kong SAR")) %>%
+  mutate(across(country,str_replace,"China mainland","China, mainland")) %>%
+  mutate(across(country,str_replace,"Bolivia","Bolivia (Plurinational State of)")) 
 ```
 
+This leaves three countries that are listed in `climate_footprint_data`
+but not in `planetary_health_emissions_data`, meaning that EAT Lancet
+data will be unavailable for these three areas.
+
+``` r
+anti_join(climate_footprint_data,planetary_health_emissions_data,by="country") %>%
+  distinct(country)
+```
+
+    ##                                     country
+    ## 1                                   Bermuda
+    ## 2                         Brunei Darussalam
+    ## 3 The former Yugoslav Republic of Macedonia
+
+We can now turn to the 14 remaining countries that are listed in
+`planetary_health_emissions_data` but not `climate_footprint_data`.
+
+``` r
+anti_join(planetary_health_emissions_data,climate_footprint_data,by="country") %>% distinct(country)
+```
+
+    ##                             country
+    ## 1                          Mongolia
+    ## 2                              Cuba
+    ## 3              United Arab Emirates
+    ## 4                            Guinea
+    ## 5                          Djibouti
+    ## 6                             Gabon
+    ## 7               Trinidad and Tobago
+    ## 8             Saint Kitts and Nevis
+    ## 9  Saint Vincent and the Grenadines
+    ## 10                      Saint Lucia
+    ## 11                     Sierra Leone
+    ## 12                       Bangladesh
+    ## 13                          Grenada
+    ## 14                          Nigeria
+
+With these alignments complete, we can now bind the rows together.
+
+``` r
+impact_model_data <- bind_rows(planetary_health_emissions_data,climate_footprint_data)
+```
+
+Because of how the columns will be concatenated once we pivot the
+tibble, we will preemptively modify how the “EAT Lancet” and “2/3_vegan”
+patterns are represented under the `diet` string to avoid possible
+issues stemming from the spacing on the former and the special-character
+use on the latter.
+
+``` r
+impact_model_data <- impact_model_data %>% 
+  mutate(across(diet,str_replace,"EAT Lancet","eat_lancet")) %>%
+  mutate(across(diet,str_replace,"2/3_vegan","two_thirds_vegan")) 
+```
+
+Now, we perform a series of changes that will pivot the table such that
+each country is represented by a single row with columns corresponding
+to the different emissions profiles, as given by the annual per capita
+kilograms of carbon-dioxide equivalents, associated with the following
+dietary patterns: baseline, adjusted baseline, OECD baseline, meatless
+day, low red meat, no red meat, no dairy, pescetarian, EAT Lancet,
+vegetarian, 2/3 vegan, and vegan.
+
+``` r
+impact_model_data <- impact_model_data %>% 
+  select(country,diet,attribute,value) %>%
+  pivot_wider(names_from=c(diet,attribute),
+              values_from=c(value)) %>%
+  select(country,baseline_per_capita_kg_co2e,baseline_adjusted_per_capita_kg_co2e,baseline_oecd_per_capita_kg_co2e,meatless_day_per_capita_kg_co2e,low_red_meat_per_capita_kg_co2e,no_red_meat_per_capita_kg_co2e,no_dairy_per_capita_kg_co2e,pescetarian_per_capita_kg_co2e,lacto_ovo_vegetarian_per_capita_kg_co2e,two_thirds_vegan_per_capita_kg_co2e,vegan_per_capita_kg_co2e)
+```
+
+Finally, we (optionally) remove the 17 countries with incomplete data.
+
+``` r
+impact_modeL_data <- impact_model_data %>% 
+  filter(!country=="Bermuda") %>%
+  filter(!country=="Brunei Darussalam") %>%
+  filter(!country=="The former Yugoslav Republic of Macedonia") %>%
+  filter(!country=="Mongolia") %>%
+  filter(!country=="Cuba") %>%
+  filter(!country=="United Arab Emirates") %>%
+  filter(!country=="Guinea") %>%
+  filter(!country=="Djibouti") %>%
+  filter(!country=="Gabon") %>%
+  filter(!country=="Trinidad and Tobago") %>%
+  filter(!country=="Saint Kitts and Nevis") %>%
+  filter(!country=="Saint Vincent and the Grenadines") %>%
+  filter(!country=="Saint Lucia") %>%
+  filter(!country=="Sierra Leone") %>%
+  filter(!country=="Bangladesh") %>%
+  filter(!country=="Grenada") %>%
+  filter(!country=="Nigeria") 
+impact_modeL_data
+```
+
+    ## # A tibble: 137 × 12
+    ##    country       basel…¹ basel…² basel…³ meatl…⁴ low_r…⁵ no_re…⁶ no_da…⁷ pesce…⁸
+    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Paraguay        5604.   4137.   5825.   3689.   4159.   1041.   3975.   1005.
+    ##  2 Chile           3895.   3747.   4044.   3387.   3416.    892.   3419.    827.
+    ##  3 Brazil          4366.   3421.   3454.   3219.   3170.   1557.   2690.   1053.
+    ##  4 Argentina       3517.   2784.   2279.   2557.   2180.   1062.   2505.    887.
+    ##  5 Australia       3142.   2799.   2298.   2635.   2079.   1156.   2389.   1121.
+    ##  6 Bolivia (Plu…   2654.   3414.   4132.   3285.   3214.   1610.   3128.    901.
+    ##  7 Central Afri…   2512.   3835.   5673.   3559.   3846.   1447.   3120.    638.
+    ##  8 Uruguay         2667.   2207.   2222.   2059.   2034.   1081.   1728.   1038.
+    ##  9 New Zealand     2634.   2476.   2106.   2385.   1944.   1306.   1933.   1173.
+    ## 10 Israel          2344.   1765.   2201.   1674.   1765.    895.   1493.    825.
+    ## # … with 127 more rows, 3 more variables:
+    ## #   lacto_ovo_vegetarian_per_capita_kg_co2e <dbl>,
+    ## #   two_thirds_vegan_per_capita_kg_co2e <dbl>, vegan_per_capita_kg_co2e <dbl>,
+    ## #   and abbreviated variable names ¹​baseline_per_capita_kg_co2e,
+    ## #   ²​baseline_adjusted_per_capita_kg_co2e, ³​baseline_oecd_per_capita_kg_co2e,
+    ## #   ⁴​meatless_day_per_capita_kg_co2e, ⁵​low_red_meat_per_capita_kg_co2e,
+    ## #   ⁶​no_red_meat_per_capita_kg_co2e, ⁷​no_dairy_per_capita_kg_co2e, …
+
 ## Adjusting the University-Enrollment Data
+
+Like we did for the dietary-footprint data, we will need to perform a
+series of transformations to `university-enrollment_data` before
+executing our spatial join.
+
+More specifically, we will need to mirror the structure introduced for
+`climate_footprint_data`, whereby each country is represented by a
+single row, with subsequent columns representing each of the indicators
+of interest.
+
+We begin this process by extracting the relevant columns, assigning a
+format to the data frame, and removing the source information and update
+history from the bottommost rows of the data set. For convenience, we
+also rename the columns corresponding to the designated year range and
+replace the NA values
+
+``` r
+university_enrollment_data %>% 
+  select(-Country.Code,-Series.Code) %>% 
+  as_tibble(university_enrollment_data) %>%
+  slice(1:(n()-5)) %>%
+  rename(country=Country.Name,series=Series,yr2000=X2000..YR2000.,yr2001=X2001..YR2001.,yr2002=X2002..YR2002.,yr2003=X2003..YR2003.,yr2004=X2004..YR2004.,yr2005=X2005..YR2005.,yr2006=X2006..YR2006.,yr2007=X2007..YR2007.,yr2008=X2008..YR2008.,yr2009=X2009..YR2009.,yr2010=X2010..YR2010.,yr2011=X2011..YR2011.,yr2012=X2012..YR2012.,yr2013=X2013..YR2013.,yr2014=X2014..YR2014.,yr2015=X2015..YR2015.,yr2016=X2016..YR2016.,yr2017=X2017..YR2017.,yr2018=X2018..YR2018.,yr2019=X2019..YR2019.,yr2020=X2020..YR2020.) 
+```
+
+    ## # A tibble: 1,632 × 28
+    ##    country series yr2000 yr2001 yr2002 yr2003 yr2004 yr2005 yr2006 yr2007 yr2008
+    ##    <chr>   <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr> 
+    ##  1 Afghan… GNI p… ..     ..     ..     ..     ..     ..     ..     ..     ..    
+    ##  2 Afghan… Popul… 20779… 21606… 22600… 23680… 24726… 25654… 26433… 27100… 27722…
+    ##  3 Afghan… Schoo… 18337… 19309… 20500… 21799… 23052… 24158… 24573… 24794… 24949…
+    ##  4 Afghan… Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
+    ##  5 Afghan… Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
+    ##  6 Afghan… Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
+    ##  7 Albania GNI p… 1100   1280   1370   1650   2100   2620   3050   3460   4030  
+    ##  8 Albania Popul… 30890… 30601… 30510… 30396… 30269… 30114… 29925… 29700… 29473…
+    ##  9 Albania Schoo… 258261 256900 258469 261748 266530 272779 280612 283060 282325
+    ## 10 Albania Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
+    ## # … with 1,622 more rows, and 17 more variables: yr2009 <chr>, yr2010 <chr>,
+    ## #   yr2011 <chr>, yr2012 <chr>, yr2013 <chr>, yr2014 <chr>, yr2015 <chr>,
+    ## #   yr2016 <chr>, yr2017 <chr>, yr2018 <chr>, yr2019 <chr>, yr2020 <chr>,
+    ## #   X2021..YR2021. <chr>, X2022..YR2022. <chr>, X2023..YR2023. <chr>,
+    ## #   X2024..YR2024. <chr>, X2025..YR2025. <chr>
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
