@@ -550,31 +550,63 @@ also rename the columns corresponding to the designated year range and
 replace the NA values
 
 ``` r
-university_enrollment_data %>% 
-  select(-Country.Code,-Series.Code) %>% 
+university_enrollment_data <- university_enrollment_data %>% 
+  select(-Country.Code,-Series.Code,-X2020..YR2020.,-X2021..YR2021.,-X2022..YR2022.,-X2023..YR2023.,-X2024..YR2024.,-X2025..YR2025.) %>% 
   as_tibble(university_enrollment_data) %>%
   slice(1:(n()-5)) %>%
-  rename(country=Country.Name,series=Series,yr2000=X2000..YR2000.,yr2001=X2001..YR2001.,yr2002=X2002..YR2002.,yr2003=X2003..YR2003.,yr2004=X2004..YR2004.,yr2005=X2005..YR2005.,yr2006=X2006..YR2006.,yr2007=X2007..YR2007.,yr2008=X2008..YR2008.,yr2009=X2009..YR2009.,yr2010=X2010..YR2010.,yr2011=X2011..YR2011.,yr2012=X2012..YR2012.,yr2013=X2013..YR2013.,yr2014=X2014..YR2014.,yr2015=X2015..YR2015.,yr2016=X2016..YR2016.,yr2017=X2017..YR2017.,yr2018=X2018..YR2018.,yr2019=X2019..YR2019.,yr2020=X2020..YR2020.) 
+  rename(country=Country.Name,series=Series,yr2000=X2000..YR2000.,yr2001=X2001..YR2001.,yr2002=X2002..YR2002.,yr2003=X2003..YR2003.,yr2004=X2004..YR2004.,yr2005=X2005..YR2005.,yr2006=X2006..YR2006.,yr2007=X2007..YR2007.,yr2008=X2008..YR2008.,yr2009=X2009..YR2009.,yr2010=X2010..YR2010.,yr2011=X2011..YR2011.,yr2012=X2012..YR2012.,yr2013=X2013..YR2013.,yr2014=X2014..YR2014.,yr2015=X2015..YR2015.,yr2016=X2016..YR2016.,yr2017=X2017..YR2017.,yr2018=X2018..YR2018.,yr2019=X2019..YR2019.) 
 ```
 
-    ## # A tibble: 1,632 × 28
-    ##    country series yr2000 yr2001 yr2002 yr2003 yr2004 yr2005 yr2006 yr2007 yr2008
-    ##    <chr>   <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  <chr> 
-    ##  1 Afghan… GNI p… ..     ..     ..     ..     ..     ..     ..     ..     ..    
-    ##  2 Afghan… Popul… 20779… 21606… 22600… 23680… 24726… 25654… 26433… 27100… 27722…
-    ##  3 Afghan… Schoo… 18337… 19309… 20500… 21799… 23052… 24158… 24573… 24794… 24949…
-    ##  4 Afghan… Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
-    ##  5 Afghan… Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
-    ##  6 Afghan… Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
-    ##  7 Albania GNI p… 1100   1280   1370   1650   2100   2620   3050   3460   4030  
-    ##  8 Albania Popul… 30890… 30601… 30510… 30396… 30269… 30114… 29925… 29700… 29473…
-    ##  9 Albania Schoo… 258261 256900 258469 261748 266530 272779 280612 283060 282325
-    ## 10 Albania Enrol… ..     ..     ..     ..     ..     ..     ..     ..     ..    
-    ## # … with 1,622 more rows, and 17 more variables: yr2009 <chr>, yr2010 <chr>,
-    ## #   yr2011 <chr>, yr2012 <chr>, yr2013 <chr>, yr2014 <chr>, yr2015 <chr>,
-    ## #   yr2016 <chr>, yr2017 <chr>, yr2018 <chr>, yr2019 <chr>, yr2020 <chr>,
-    ## #   X2021..YR2021. <chr>, X2022..YR2022. <chr>, X2023..YR2023. <chr>,
-    ## #   X2024..YR2024. <chr>, X2025..YR2025. <chr>
+To convert the reference-year columns from character strings to double
+vectors, which will be more appropriate for downstream mutations, we use
+the following:
+
+``` r
+university_enrollment_data <- university_enrollment_data %>% 
+  mutate_at(c("yr2000","yr2001","yr2002","yr2003","yr2004","yr2005","yr2006","yr2007","yr2008","yr2009","yr2010","yr2011","yr2012","yr2013","yr2014","yr2015","yr2016","yr2017","yr2018","yr2019"),as.double) %>%
+    replace(is.na(.),0)
+```
+
+We also convert the resulting NA values, which are coercively introduced
+from the double transformation—shifting the `..` values, which represent
+a lack of data entry, to `NA` values—to zeros, namely to more easily set
+up the conditional logic for future steps.
+
+We will now pivot the tibble so that the indicators represented under
+the `series` column are represented as their own variables, with each
+row corresponding to a country. We will also abbreviate the indicators
+for convenience.
+
+``` r
+university_enrollment_data <- university_enrollment_data %>%
+  distinct() %>%
+  mutate(across("series",str_replace, fixed("School age population, tertiary education, both sexes (number)"),"school_aged_population")) %>%
+  mutate(across(series,str_replace,fixed("Enrolment in tertiary education, ISCED 6 programmes, both sexes (number)"),"isced_6_enrollment")) %>%
+  mutate(across("series",str_replace, fixed("Enrolment in tertiary education, ISCED 7 programmes, both sexes (number)"),"isced_7_enrollment")) %>%
+  mutate(across("series",str_replace, fixed("Enrolment in tertiary education, ISCED 8 programmes, both sexes (number)"),"isced_8_enrollment")) %>%
+  mutate(across("series",str_replace, fixed("Population, total"),"national_population")) %>%
+  mutate(across("series",str_replace, fixed("GNI per capita, Atlas method (current US$)"),"per_capita_gni")) %>%
+  pivot_wider(names_from="series",
+              values_from=c("yr2019","yr2018","yr2017","yr2016","yr2015","yr2014","yr2013","yr2012","yr2011","yr2010","yr2009","yr2008","yr2007","yr2006","yr2005","yr2004","yr2003","yr2002","yr2001","yr2000"))
+```
+
+We are now left with a format that is closer to our desired
+specifications, where the data associated with each included country
+corresponds to one row, with concatenated column titles representing the
+different indicators we have selected and the reference years the
+population values correspond to.
+
+The problem, though, is that we only need one value across all
+indicators of interest for each country. The trouble, though, is that
+some of these indicators are recorded more consistently than others,
+with the more direct issue being that the most recent reference year for
+which there is data across the indicators may not be the same across all
+indicators of interest. As a result, we want to pull the values from the
+most recent reference year where there is available data for both the
+national population indicator as well as each of the stratified ISCED
+enrollment totals.
+
+The challenge, now,
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
