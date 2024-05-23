@@ -296,11 +296,11 @@ impact_modeL_data
 
 ## Adjusting the University-Enrollment Data
 
-Like we did for the dietary-footprint data, we will need to perform a series of transformations to `university-enrollment_data` before executing our spatial join.
+Like we did for the dietary-footprint data, we will need to perform a series of transformations to `university-enrollment_data` before we are able to spatially join the primary three data sources.
 
-More specifically, we will need to mirror the structure introduced for `climate_footprint_data`, whereby each country is represented by a single row, with subsequent columns representing each of the indicators of interest.
+More specifically, we will need to mirror the structure adopted in both `shapefilea_data` and `climate_footprint_data`, whereby each country is represented by a single row, with all subsequent columns representing the relevant spatial and environmental indicators of interest.
 
-We begin this process by extracting the relevant columns, assigning a format to the data frame, and removing the source information and update history from the bottommost rows of the data set. For convenience, we also rename the columns corresponding to the designated year range and replace the NA values 
+For `university_enrollment_data`, we can begin this process by extracting the relevant columns, assigning a format to the data frame, and removing the source information and update-history stamps from the bottommost rows of the data set. For convenience, we also take this opportunity to rename the columns for each of the years where there is available data. 
 
 ```{r}
 university_enrollment_data <- university_enrollment_data %>% 
@@ -310,7 +310,7 @@ university_enrollment_data <- university_enrollment_data %>%
   rename(country=Country.Name,series=Series,yr2000=X2000..YR2000.,yr2001=X2001..YR2001.,yr2002=X2002..YR2002.,yr2003=X2003..YR2003.,yr2004=X2004..YR2004.,yr2005=X2005..YR2005.,yr2006=X2006..YR2006.,yr2007=X2007..YR2007.,yr2008=X2008..YR2008.,yr2009=X2009..YR2009.,yr2010=X2010..YR2010.,yr2011=X2011..YR2011.,yr2012=X2012..YR2012.,yr2013=X2013..YR2013.,yr2014=X2014..YR2014.,yr2015=X2015..YR2015.,yr2016=X2016..YR2016.,yr2017=X2017..YR2017.,yr2018=X2018..YR2018.,yr2019=X2019..YR2019.) 
 ```
 
-To convert the reference-year columns from character strings to double vectors, which will be more appropriate for downstream mutations, we use the following:
+We also use the following to convert the reference-year columns from character strings to double vectors in preparation for our downstream mutations, changing, in the process, the coerced `NA` inputs into zeros to more easily set up the conditional logic that will be used in the upcoming steps:
 
 ```{r warning=FALSE}
 university_enrollment_data <- university_enrollment_data %>% 
@@ -318,10 +318,7 @@ university_enrollment_data <- university_enrollment_data %>%
     replace(is.na(.),0)
 ```
 
-We also convert the resulting NA values, which are coercively introduced from the double transformation—shifting the `..` values, which represent a lack of data entry, to `NA` values—to zeros, namely to more easily set up the conditional logic for future steps. 
-
-We will now pivot the tibble so that the indicators represented under the `series` column are represented as their own variables, with each row corresponding to a country. We will also abbreviate the indicators for convenience. 
-
+We will now pivot the tibble so that the population-level indicators arranged under the `series` column are represented as their own variables, with each country corresponding to a single row. We will also take this opportunity to abbreviate the listed indicators for convenience. 
 
 ```{r}
 university_enrollment_data <- university_enrollment_data %>%
@@ -336,12 +333,63 @@ university_enrollment_data <- university_enrollment_data %>%
               values_from=c("yr2019","yr2018","yr2017","yr2016","yr2015","yr2014","yr2013","yr2012","yr2011","yr2010","yr2009","yr2008","yr2007","yr2006","yr2005","yr2004","yr2003","yr2002","yr2001","yr2000"))
 ```
 
+We are now left with a format that is closer to our desired specifications, such that the data for each country corresponds to a single row, with concatenated columns mapping to the values for the different indicators we have selected by reference year.
 
-We are now left with a format that is closer to our desired specifications, where the data associated with each included country corresponds to one row, with concatenated column titles representing the different indicators we have selected and the reference years the population values correspond to.
+The problem, though, is that, for each country, we only need one value across each of the specified indicators. 
 
-The problem, though, is that we only need one value across all indicators of interest for each country. The trouble, though, is that some of these indicators are recorded more consistently than others, with the more direct issue being that the most recent reference year for which there is data across the indicators may not be the same across all indicators of interest. As a result, we want to pull the values from the most recent reference year where there is available data for both the national population indicator as well as each of the stratified ISCED enrollment totals.
+The trouble with this, though, is that some of these indicators were recorded more recently than others,meaning that the most recent year for which there is data on one indicator may not be the same across all the remaining indicators of interest. 
 
-The challenge, now, 
+
+As a result, we want to pull the values from the most recent reference year for which there is data available across all indicators of interest.
+
+This will require us to conditionally mutate seven new columns (1) one capturing the per capita gross national income, (2) another capturing the national population, (3) one capturing the school-aged population for tertiary education programs (18-23, according to [this](https://www.un.org/esa/sustdev/natlinfo/indicators/indisd/english/chapt36e.htm#:~:text=The%20school%2Dage%20population%20is%20generally%20defined%20in%20three%20age,educational%20levels%20of%20many%20countries.) UNESCO-provided definition), (4) another capturing the number of enrollees in ISCED 6 programs, (5) one capturing the number of enrollees in ISCED 7 programs, (6) another capturing the number of enrollees in ISCED 8 programs, and (7) one that denoting the most recent reference year from which all of these variables are being represented.
+
+To accomplish this, we will first mutate new columns identifying the most recent year for which each indicator has data represented across the included countries.
+
+```{r}
+university_enrollment_data <- university_enrollment_data %>%
+  mutate(per_capita_gni_ref_year=ifelse(yr2019_per_capita_gni>0,2019,ifelse(yr2018_per_capita_gni>0,2018,ifelse(yr2017_per_capita_gni>0,2017,ifelse(yr2016_per_capita_gni>0,2016,ifelse(yr2015_per_capita_gni>0,2015,ifelse(yr2014_per_capita_gni>0,2014,ifelse(yr2013_per_capita_gni>0,2013,ifelse(yr2012_per_capita_gni>0,2012,ifelse(yr2011_per_capita_gni>0,2011,ifelse(yr2010_per_capita_gni>0,2010,ifelse(yr2009_per_capita_gni>0,2009,ifelse(yr2008_per_capita_gni>0,2008,ifelse(yr2007_per_capita_gni>0,2007,ifelse(yr2006_per_capita_gni>0,2006,ifelse(yr2005_per_capita_gni>0,2005,ifelse(yr2004_per_capita_gni>0,2004,ifelse(yr2003_per_capita_gni>0,2003,ifelse(yr2002_per_capita_gni>0,2002,ifelse(yr2001_per_capita_gni>0,2001,ifelse(yr2000_per_capita_gni>0,2000,0))))))))))))))))))))) %>%
+  mutate(national_population_ref_year=ifelse(yr2019_national_population>0,2019,ifelse(yr2018_national_population>0,2018,ifelse(yr2017_national_population>0,2017,ifelse(yr2016_national_population>0,2016,ifelse(yr2015_national_population>0,2015,ifelse(yr2014_national_population>0,2014,ifelse(yr2013_national_population>0,2013,ifelse(yr2012_national_population>0,2012,ifelse(yr2011_national_population>0,2011,ifelse(yr2010_national_population>0,2010,ifelse(yr2009_national_population>0,2009,ifelse(yr2008_national_population>0,2008,ifelse(yr2007_national_population>0,2007,ifelse(yr2006_national_population>0,2006,ifelse(yr2005_national_population>0,2005,ifelse(yr2004_national_population>0,2004,ifelse(yr2003_national_population>0,2003,ifelse(yr2002_national_population>0,2002,ifelse(yr2001_national_population>0,2001,ifelse(yr2000_national_population>0,2000,0))))))))))))))))))))) %>%
+  mutate(school_aged_population_ref_year=ifelse(yr2019_school_aged_population>0,2019,ifelse(yr2018_school_aged_population>0,2018,ifelse(yr2017_school_aged_population>0,2017,ifelse(yr2016_school_aged_population>0,2016,ifelse(yr2015_school_aged_population>0,2015,ifelse(yr2014_school_aged_population>0,2014,ifelse(yr2013_school_aged_population>0,2013,ifelse(yr2012_school_aged_population>0,2012,ifelse(yr2011_school_aged_population>0,2011,ifelse(yr2010_school_aged_population>0,2010,ifelse(yr2009_school_aged_population>0,2009,ifelse(yr2008_school_aged_population>0,2008,ifelse(yr2007_school_aged_population>0,2007,ifelse(yr2006_school_aged_population>0,2006,ifelse(yr2005_school_aged_population>0,2005,ifelse(yr2004_school_aged_population>0,2004,ifelse(yr2003_school_aged_population>0,2003,ifelse(yr2002_school_aged_population>0,2002,ifelse(yr2001_school_aged_population>0,2001,ifelse(yr2000_school_aged_population>0,2000,0))))))))))))))))))))) %>%
+  mutate(isced_6_ref_year=ifelse(yr2019_isced_6_enrollment>0,2019,ifelse(yr2018_isced_6_enrollment>0,2018,ifelse(yr2017_isced_6_enrollment>0,2017,ifelse(yr2016_isced_6_enrollment>0,2016,ifelse(yr2015_isced_6_enrollment>0,2015,ifelse(yr2014_isced_6_enrollment>0,2014,ifelse(yr2013_isced_6_enrollment>0,2013,ifelse(yr2012_isced_6_enrollment>0,2012,ifelse(yr2011_isced_6_enrollment>0,2011,ifelse(yr2010_isced_6_enrollment>0,2010,ifelse(yr2009_isced_6_enrollment>0,2009,ifelse(yr2008_isced_6_enrollment>0,2008,ifelse(yr2007_isced_6_enrollment>0,2007,ifelse(yr2006_isced_6_enrollment>0,2006,ifelse(yr2005_isced_6_enrollment>0,2005,ifelse(yr2004_isced_6_enrollment>0,2004,ifelse(yr2003_isced_6_enrollment>0,2003,ifelse(yr2002_isced_6_enrollment>0,2002,ifelse(yr2001_isced_6_enrollment>0,2001,ifelse(yr2000_isced_6_enrollment>0,2000,0))))))))))))))))))))) %>%
+   mutate(isced_7_ref_year=ifelse(yr2019_isced_7_enrollment>0,2019,ifelse(yr2018_isced_7_enrollment>0,2018,ifelse(yr2017_isced_7_enrollment>0,2017,ifelse(yr2016_isced_7_enrollment>0,2016,ifelse(yr2015_isced_7_enrollment>0,2015,ifelse(yr2014_isced_7_enrollment>0,2014,ifelse(yr2013_isced_7_enrollment>0,2013,ifelse(yr2012_isced_7_enrollment>0,2012,ifelse(yr2011_isced_7_enrollment>0,2011,ifelse(yr2010_isced_7_enrollment>0,2010,ifelse(yr2009_isced_7_enrollment>0,2009,ifelse(yr2008_isced_7_enrollment>0,2008,ifelse(yr2007_isced_7_enrollment>0,2007,ifelse(yr2006_isced_7_enrollment>0,2006,ifelse(yr2005_isced_7_enrollment>0,2005,ifelse(yr2004_isced_7_enrollment>0,2004,ifelse(yr2003_isced_7_enrollment>0,2003,ifelse(yr2002_isced_7_enrollment>0,2002,ifelse(yr2001_isced_7_enrollment>0,2001,ifelse(yr2000_isced_7_enrollment>0,2000,0))))))))))))))))))))) %>%
+  mutate(isced_8_ref_year=ifelse(yr2019_isced_8_enrollment>0,2019,ifelse(yr2018_isced_8_enrollment>0,2018,ifelse(yr2017_isced_8_enrollment>0,2017,ifelse(yr2016_isced_8_enrollment>0,2016,ifelse(yr2015_isced_8_enrollment>0,2015,ifelse(yr2014_isced_8_enrollment>0,2014,ifelse(yr2013_isced_8_enrollment>0,2013,ifelse(yr2012_isced_8_enrollment>0,2012,ifelse(yr2011_isced_8_enrollment>0,2011,ifelse(yr2010_isced_8_enrollment>0,2010,ifelse(yr2009_isced_8_enrollment>0,2009,ifelse(yr2008_isced_8_enrollment>0,2008,ifelse(yr2007_isced_8_enrollment>0,2007,ifelse(yr2006_isced_8_enrollment>0,2006,ifelse(yr2005_isced_8_enrollment>0,2005,ifelse(yr2004_isced_8_enrollment>0,2004,ifelse(yr2003_isced_8_enrollment>0,2003,ifelse(yr2002_isced_8_enrollment>0,2002,ifelse(yr2001_isced_8_enrollment>0,2001,ifelse(yr2000_isced_8_enrollment>0,2000,0))))))))))))))))))))) 
+```
+
+From an initial glance, we can see that, for some of the countries included in the dataset, there are differences in the reference years being pulled across the various indicators of interest, with some countries having no indicator-specific data between 2000 and 2019.
+
+This means that, in addition to there being cases where we need to align the reference years from which the values are being pulled, such that the values for each country across all indicators line up to the same reference year, we also know that there are some countries that we can remove from the dataset entirely. 
+
+For example, we can surmise that, for the countries where the sum of `isced_6_ref_year`, `isced_7_ref_year`, and `isced_8_ref_year` is equivalent to `0`, there is no available university-enrollment data.
+
+We identify these cases here:
+
+```{r}
+university_enrollment_data %>%
+  filter(isced_6_ref_year+isced_7_ref_year+isced_8_ref_year==0) %>%
+  select(country)
+```
+
+Given that these countries have no available enrollment data, we can remove them from the tibble using the following:
+
+```{r}
+university_enrollment_data <- university_enrollment_data %>%
+  rowwise() %>%
+  filter(!isced_6_ref_year+isced_7_ref_year+isced_8_ref_year==0)
+```
+
+
+
+With these rows removed, we can begin generating the columns that pull the values.
+
+```{r}
+
+```
+
+
+
+
+
 
 ```{r}
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
