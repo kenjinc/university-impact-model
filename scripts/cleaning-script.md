@@ -627,7 +627,7 @@ university_enrollment_data <- university_enrollment_data %>%
   mutate(national_population_ref_year=ifelse(yr2019_national_population>0,2019,ifelse(yr2018_national_population>0,2018,ifelse(yr2017_national_population>0,2017,ifelse(yr2016_national_population>0,2016,ifelse(yr2015_national_population>0,2015,ifelse(yr2014_national_population>0,2014,ifelse(yr2013_national_population>0,2013,ifelse(yr2012_national_population>0,2012,ifelse(yr2011_national_population>0,2011,ifelse(yr2010_national_population>0,2010,ifelse(yr2009_national_population>0,2009,ifelse(yr2008_national_population>0,2008,ifelse(yr2007_national_population>0,2007,ifelse(yr2006_national_population>0,2006,ifelse(yr2005_national_population>0,2005,ifelse(yr2004_national_population>0,2004,ifelse(yr2003_national_population>0,2003,ifelse(yr2002_national_population>0,2002,ifelse(yr2001_national_population>0,2001,ifelse(yr2000_national_population>0,2000,0))))))))))))))))))))) %>%
   mutate(school_aged_population_ref_year=ifelse(yr2019_school_aged_population>0,2019,ifelse(yr2018_school_aged_population>0,2018,ifelse(yr2017_school_aged_population>0,2017,ifelse(yr2016_school_aged_population>0,2016,ifelse(yr2015_school_aged_population>0,2015,ifelse(yr2014_school_aged_population>0,2014,ifelse(yr2013_school_aged_population>0,2013,ifelse(yr2012_school_aged_population>0,2012,ifelse(yr2011_school_aged_population>0,2011,ifelse(yr2010_school_aged_population>0,2010,ifelse(yr2009_school_aged_population>0,2009,ifelse(yr2008_school_aged_population>0,2008,ifelse(yr2007_school_aged_population>0,2007,ifelse(yr2006_school_aged_population>0,2006,ifelse(yr2005_school_aged_population>0,2005,ifelse(yr2004_school_aged_population>0,2004,ifelse(yr2003_school_aged_population>0,2003,ifelse(yr2002_school_aged_population>0,2002,ifelse(yr2001_school_aged_population>0,2001,ifelse(yr2000_school_aged_population>0,2000,0))))))))))))))))))))) %>%
   mutate(isced_6_ref_year=ifelse(yr2019_isced_6_enrollment>0,2019,ifelse(yr2018_isced_6_enrollment>0,2018,ifelse(yr2017_isced_6_enrollment>0,2017,ifelse(yr2016_isced_6_enrollment>0,2016,ifelse(yr2015_isced_6_enrollment>0,2015,ifelse(yr2014_isced_6_enrollment>0,2014,ifelse(yr2013_isced_6_enrollment>0,2013,ifelse(yr2012_isced_6_enrollment>0,2012,ifelse(yr2011_isced_6_enrollment>0,2011,ifelse(yr2010_isced_6_enrollment>0,2010,ifelse(yr2009_isced_6_enrollment>0,2009,ifelse(yr2008_isced_6_enrollment>0,2008,ifelse(yr2007_isced_6_enrollment>0,2007,ifelse(yr2006_isced_6_enrollment>0,2006,ifelse(yr2005_isced_6_enrollment>0,2005,ifelse(yr2004_isced_6_enrollment>0,2004,ifelse(yr2003_isced_6_enrollment>0,2003,ifelse(yr2002_isced_6_enrollment>0,2002,ifelse(yr2001_isced_6_enrollment>0,2001,ifelse(yr2000_isced_6_enrollment>0,2000,0))))))))))))))))))))) %>%
-   mutate(isced_7_ref_year=ifelse(yr2019_isced_7_enrollment>0,2019,ifelse(yr2018_isced_7_enrollment>0,2018,ifelse(yr2017_isced_7_enrollment>0,2017,ifelse(yr2016_isced_7_enrollment>0,2016,ifelse(yr2015_isced_7_enrollment>0,2015,ifelse(yr2014_isced_7_enrollment>0,2014,ifelse(yr2013_isced_7_enrollment>0,2013,ifelse(yr2012_isced_7_enrollment>0,2012,ifelse(yr2011_isced_7_enrollment>0,2011,ifelse(yr2010_isced_7_enrollment>0,2010,ifelse(yr2009_isced_7_enrollment>0,2009,ifelse(yr2008_isced_7_enrollment>0,2008,ifelse(yr2007_isced_7_enrollment>0,2007,ifelse(yr2006_isced_7_enrollment>0,2006,ifelse(yr2005_isced_7_enrollment>0,2005,ifelse(yr2004_isced_7_enrollment>0,2004,ifelse(yr2003_isced_7_enrollment>0,2003,ifelse(yr2002_isced_7_enrollment>0,2002,ifelse(yr2001_isced_7_enrollment>0,2001,ifelse(yr2000_isced_7_enrollment>0,2000,0))))))))))))))))))))) %>%
+  mutate(isced_7_ref_year=ifelse(yr2019_isced_7_enrollment>0,2019,ifelse(yr2018_isced_7_enrollment>0,2018,ifelse(yr2017_isced_7_enrollment>0,2017,ifelse(yr2016_isced_7_enrollment>0,2016,ifelse(yr2015_isced_7_enrollment>0,2015,ifelse(yr2014_isced_7_enrollment>0,2014,ifelse(yr2013_isced_7_enrollment>0,2013,ifelse(yr2012_isced_7_enrollment>0,2012,ifelse(yr2011_isced_7_enrollment>0,2011,ifelse(yr2010_isced_7_enrollment>0,2010,ifelse(yr2009_isced_7_enrollment>0,2009,ifelse(yr2008_isced_7_enrollment>0,2008,ifelse(yr2007_isced_7_enrollment>0,2007,ifelse(yr2006_isced_7_enrollment>0,2006,ifelse(yr2005_isced_7_enrollment>0,2005,ifelse(yr2004_isced_7_enrollment>0,2004,ifelse(yr2003_isced_7_enrollment>0,2003,ifelse(yr2002_isced_7_enrollment>0,2002,ifelse(yr2001_isced_7_enrollment>0,2001,ifelse(yr2000_isced_7_enrollment>0,2000,0))))))))))))))))))))) %>%
   mutate(isced_8_ref_year=ifelse(yr2019_isced_8_enrollment>0,2019,ifelse(yr2018_isced_8_enrollment>0,2018,ifelse(yr2017_isced_8_enrollment>0,2017,ifelse(yr2016_isced_8_enrollment>0,2016,ifelse(yr2015_isced_8_enrollment>0,2015,ifelse(yr2014_isced_8_enrollment>0,2014,ifelse(yr2013_isced_8_enrollment>0,2013,ifelse(yr2012_isced_8_enrollment>0,2012,ifelse(yr2011_isced_8_enrollment>0,2011,ifelse(yr2010_isced_8_enrollment>0,2010,ifelse(yr2009_isced_8_enrollment>0,2009,ifelse(yr2008_isced_8_enrollment>0,2008,ifelse(yr2007_isced_8_enrollment>0,2007,ifelse(yr2006_isced_8_enrollment>0,2006,ifelse(yr2005_isced_8_enrollment>0,2005,ifelse(yr2004_isced_8_enrollment>0,2004,ifelse(yr2003_isced_8_enrollment>0,2003,ifelse(yr2002_isced_8_enrollment>0,2002,ifelse(yr2001_isced_8_enrollment>0,2001,ifelse(yr2000_isced_8_enrollment>0,2000,0))))))))))))))))))))) 
 ```
 
@@ -670,7 +670,7 @@ university_enrollment_data %>%
     ## # … with 46 more rows
 
 Given that these countries have no available enrollment data, we can
-remove them from the tibble using the following:
+remove them from the tibble using the following groupings:
 
 ``` r
 university_enrollment_data <- university_enrollment_data %>%
@@ -678,8 +678,107 @@ university_enrollment_data <- university_enrollment_data %>%
   filter(!isced_6_ref_year+isced_7_ref_year+isced_8_ref_year==0)
 ```
 
+While we are at it, we can also remove the rows representing combined
+data across multiple countries. In the EdStats database, these items are
+referred to as “aggregates” and include the following:
+
+- “Arab World”
+- “Caribbean small states”
+- “Central Europe and the Baltics”
+- “Early-demographic dividend”
+- “East Asia & Pacific”
+- “East Asia & Pacific (excluding high income)”
+- “East Asia & Pacific (IDA & IBRD countries)”
+- “Euro area”
+- “Europe & Central Asia”
+- “Europe & Central Asia (excluding high income)”
+- “Europe & Central Asia (IDA & IBRD countries)”
+- “European Union”
+- “Fragile and conflict affected situations”
+- “Global Partnership for Education”
+- “Heavily indebted poor countries (HIPC)”
+- “High income”
+- “IBRD only”
+- “IDA & IBRD total”
+- “IDA blend”
+- “IDA only”
+- “IDA total”
+- “Late-demographic dividend”
+- “Latin America & Caribbean”
+- “Latin America & Caribbean (excluding high income)”
+- “Latin America & the Caribbean (IDA & IBRD countries)”
+- “Least developed countries: UN classification”
+- “Low & middle income”
+- “Low income”
+- “Lower middle income”
+- “Middle East & North Africa”
+- “Middle East & North Africa (excluding high income)”
+- “Middle East & North Africa (IDA & IBRD countries)”
+- “Middle income”
+- “North America”
+- “OECD members”
+- “Other small states”
+- “Pacific island small states”
+- “Post-demographic dividend”
+- “Pre-demographic dividend”
+- “Small states”
+- “South Asia”
+- “South Asia (IDA & IBR countries)”
+- “Sub-Saharan Africa”
+- “Sub-Saharan Africa (IDA & IBRD countries)”
+- “Sub-Saharan Africa (excluding high income)”
+- “Upper middle income”
+- “World”
+
+``` r
+university_enrollment_data <- university_enrollment_data %>% 
+  filter_at(vars(country),all_vars(!. %in% c("Arab World","Caribbean small states","Central Europe and the Baltics","Early-demographic dividend","East Asia & Pacific","East Asia & Pacific (excluding high income)","East Asia & Pacific (IDA & IBRD countries)","Euro area","Europe & Central Asia","Europe & Central Asia (excluding high income)","Europe & Central Asia (IDA & IBRD countries)","European Union","Fragile and conflict affected situations","Global Partnership for Education","Heavily indebted poor countries (HIPC)","High income","IBRD only","IDA & IBRD total","IDA blend","IDA only","IDA total","Late-demographic dividend","Latin America & Caribbean","Latin America & Caribbean (excluding high income)","Latin America & the Caribbean (IDA & IBRD countries)","Least developed countries: UN classification","Low & middle income","Low income","Lower middle income","Middle East & North Africa","Middle East & North Africa (excluding high income)","Middle East & North Africa (IDA & IBRD countries)","Middle income","North America","OECD members","Other small states","Pacific island small states","Post-demographic dividend","Pre-demographic dividend","Small states","South Asia","South Asia (IDA & IBRD)","Sub-Saharan Africa","Sub-Saharan Africa (excluding high income)","Sub-Saharan Africa (IDA & IBRD countries)","Upper middle income","World")))
+```
+
 With these rows removed, we can begin generating the columns that pull
 the values.
+
+``` r
+university_enrollment_data 
+```
+
+    ## # A tibble: 169 × 127
+    ## # Rowwise: 
+    ##    country     yr2019_…¹ yr201…² yr201…³ yr201…⁴ yr201…⁵ yr201…⁶ yr201…⁷ yr201…⁸
+    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Afghanistan         0  3.80e7       0      0        0     0       550  3.72e7
+    ##  2 Albania             0  2.87e6  232597  89231    43749  1865      4860  2.87e6
+    ##  3 Algeria             0  4.31e7       0      0        0     0         0  4.22e7
+    ##  4 Andorra             0  7.7 e4       0    554.      35    23.5       0  7.70e4
+    ##  5 Argentina           0  4.49e7       0      0        0     0     12390  4.45e7
+    ##  6 Armenia             0  2.96e6  178853  69622    10855   985      4230  2.95e6
+    ##  7 Aruba               0  1.06e5       0      0        0     0         0  1.06e5
+    ##  8 Australia           0  2.53e7       0      0        0     0     53230  2.50e7
+    ##  9 Austria             0  8.86e6       0      0        0     0     49310  8.84e6
+    ## 10 Azerbaijan          0  1.00e7  692066 160631    20954  2626      4050  9.94e6
+    ## # … with 159 more rows, 118 more variables:
+    ## #   yr2018_school_aged_population <dbl>, yr2018_isced_6_enrollment <dbl>,
+    ## #   yr2018_isced_7_enrollment <dbl>, yr2018_isced_8_enrollment <dbl>,
+    ## #   yr2017_per_capita_gni <dbl>, yr2017_national_population <dbl>,
+    ## #   yr2017_school_aged_population <dbl>, yr2017_isced_6_enrollment <dbl>,
+    ## #   yr2017_isced_7_enrollment <dbl>, yr2017_isced_8_enrollment <dbl>,
+    ## #   yr2016_per_capita_gni <dbl>, yr2016_national_population <dbl>, …
+
+We will now begin the columns that pull the actual values (NOTE THAT
+THIS DEVIATES FROM ORIGINAL PLAN - ACTUALLY JUST TAKES THE MOST RECENT
+VALUE FOR EAACH INDICATOR AT THE. COUNTRY LEVEL)
+
+``` r
+university_enrollment_data <- university_enrollment_data %>% 
+  mutate(national_population=ifelse(yr2019_national_population>0,yr2019_national_population,ifelse(yr2018_national_population>0,yr2018_national_population,ifelse(yr2017_national_population>0,yr2017_national_population,ifelse(yr2016_national_population>0,yr2016_national_population,ifelse(yr2015_national_population>0,yr2015_national_population,ifelse(yr2014_national_population>0,yr2014_national_population,ifelse(yr2013_national_population>0,yr2013_national_population,ifelse(yr2012_national_population>0,yr2012_national_population,ifelse(yr2011_national_population>0,yr2011_national_population,ifelse(yr2010_national_population>0,yr2010_national_population,ifelse(yr2009_national_population>0,yr2009_national_population,ifelse(yr2008_national_population>0,yr2008_national_population,ifelse(yr2007_national_population>0,yr2007_national_population,ifelse(yr2006_national_population>0,yr2006_national_population,ifelse(yr2005_national_population>0,yr2005_national_population,ifelse(yr2004_national_population>0,yr2004_national_population,ifelse(yr2003_national_population>0,yr2003_national_population,ifelse(yr2002_national_population>0,yr2002_national_population,ifelse(yr2001_national_population>0,yr2001_national_population,ifelse(yr2000_national_population>0,yr2000_national_population,0))))))))))))))))))))) %>%
+   mutate(school_aged_population=ifelse(yr2019_school_aged_population>0,yr2019_school_aged_population,ifelse(yr2018_school_aged_population>0,yr2018_school_aged_population,ifelse(yr2017_school_aged_population>0,yr2017_school_aged_population,ifelse(yr2016_school_aged_population>0,yr2016_school_aged_population,ifelse(yr2015_school_aged_population>0,yr2015_school_aged_population,ifelse(yr2014_school_aged_population>0,yr2014_school_aged_population,ifelse(yr2013_school_aged_population>0,yr2013_school_aged_population,ifelse(yr2012_school_aged_population>0,yr2012_school_aged_population,ifelse(yr2011_school_aged_population>0,yr2011_school_aged_population,ifelse(yr2010_school_aged_population>0,yr2010_school_aged_population,ifelse(yr2009_school_aged_population>0,yr2009_school_aged_population,ifelse(yr2008_school_aged_population>0,yr2008_school_aged_population,ifelse(yr2007_school_aged_population>0,yr2007_school_aged_population,ifelse(yr2006_school_aged_population>0,yr2006_school_aged_population,ifelse(yr2005_school_aged_population>0,yr2005_school_aged_population,ifelse(yr2004_school_aged_population>0,yr2004_school_aged_population,ifelse(yr2003_school_aged_population>0,yr2003_school_aged_population,ifelse(yr2002_school_aged_population>0,yr2002_school_aged_population,ifelse(yr2001_school_aged_population>0,yr2001_school_aged_population,ifelse(yr2000_school_aged_population>0,yr2000_school_aged_population,0))))))))))))))))))))) %>%
+  mutate(per_capita_gni=ifelse(yr2019_per_capita_gni>0,yr2019_per_capita_gni,ifelse(yr2018_per_capita_gni>0,yr2018_per_capita_gni,ifelse(yr2017_per_capita_gni>0,yr2017_per_capita_gni,ifelse(yr2016_per_capita_gni>0,yr2016_per_capita_gni,ifelse(yr2015_per_capita_gni>0,yr2015_per_capita_gni,ifelse(yr2014_per_capita_gni>0,yr2014_per_capita_gni,ifelse(yr2013_per_capita_gni>0,yr2013_per_capita_gni,ifelse(yr2012_per_capita_gni>0,yr2012_per_capita_gni,ifelse(yr2011_per_capita_gni>0,yr2011_per_capita_gni,ifelse(yr2010_per_capita_gni>0,yr2010_per_capita_gni,ifelse(yr2009_per_capita_gni>0,yr2009_per_capita_gni,ifelse(yr2008_per_capita_gni>0,yr2008_per_capita_gni,ifelse(yr2007_per_capita_gni>0,yr2007_per_capita_gni,ifelse(yr2006_per_capita_gni>0,yr2006_per_capita_gni,ifelse(yr2005_per_capita_gni>0,yr2005_per_capita_gni,ifelse(yr2004_per_capita_gni>0,yr2004_per_capita_gni,ifelse(yr2003_per_capita_gni>0,yr2003_per_capita_gni,ifelse(yr2002_per_capita_gni>0,yr2002_per_capita_gni,ifelse(yr2001_per_capita_gni>0,yr2001_per_capita_gni,ifelse(yr2000_per_capita_gni>0,yr2000_per_capita_gni,0))))))))))))))))))))) %>%
+  mutate(isced_6_enrollment=ifelse(yr2019_isced_6_enrollment>0,yr2019_isced_6_enrollment,ifelse(yr2018_isced_6_enrollment>0,yr2018_isced_6_enrollment,ifelse(yr2017_isced_6_enrollment>0,yr2017_isced_6_enrollment,ifelse(yr2016_isced_6_enrollment>0,yr2016_isced_6_enrollment,ifelse(yr2015_isced_6_enrollment>0,yr2015_isced_6_enrollment,ifelse(yr2014_isced_6_enrollment>0,yr2014_isced_6_enrollment,ifelse(yr2013_isced_6_enrollment>0,yr2013_isced_6_enrollment,ifelse(yr2012_isced_6_enrollment>0,yr2012_isced_6_enrollment,ifelse(yr2011_isced_6_enrollment>0,yr2011_isced_6_enrollment,ifelse(yr2010_isced_6_enrollment>0,yr2010_isced_6_enrollment,ifelse(yr2009_isced_6_enrollment>0,yr2009_isced_6_enrollment,ifelse(yr2008_isced_6_enrollment>0,yr2008_isced_6_enrollment,ifelse(yr2007_isced_6_enrollment>0,yr2007_isced_6_enrollment,ifelse(yr2006_isced_6_enrollment>0,yr2006_isced_6_enrollment,ifelse(yr2005_isced_6_enrollment>0,yr2005_isced_6_enrollment,ifelse(yr2004_isced_6_enrollment>0,yr2004_isced_6_enrollment,ifelse(yr2003_isced_6_enrollment>0,yr2003_isced_6_enrollment,ifelse(yr2002_isced_6_enrollment>0,yr2002_isced_6_enrollment,ifelse(yr2001_isced_6_enrollment>0,yr2001_isced_6_enrollment,ifelse(yr2000_isced_6_enrollment>0,yr2000_isced_6_enrollment,0))))))))))))))))))))) %>%
+  mutate(isced_7_enrollment=ifelse(yr2019_isced_7_enrollment>0,yr2019_isced_7_enrollment,ifelse(yr2018_isced_7_enrollment>0,yr2018_isced_7_enrollment,ifelse(yr2017_isced_7_enrollment>0,yr2017_isced_7_enrollment,ifelse(yr2016_isced_7_enrollment>0,yr2016_isced_7_enrollment,ifelse(yr2015_isced_7_enrollment>0,yr2015_isced_7_enrollment,ifelse(yr2014_isced_7_enrollment>0,yr2014_isced_7_enrollment,ifelse(yr2013_isced_7_enrollment>0,yr2013_isced_7_enrollment,ifelse(yr2012_isced_7_enrollment>0,yr2012_isced_7_enrollment,ifelse(yr2011_isced_7_enrollment>0,yr2011_isced_7_enrollment,ifelse(yr2010_isced_7_enrollment>0,yr2010_isced_7_enrollment,ifelse(yr2009_isced_7_enrollment>0,yr2009_isced_7_enrollment,ifelse(yr2008_isced_7_enrollment>0,yr2008_isced_7_enrollment,ifelse(yr2007_isced_7_enrollment>0,yr2007_isced_7_enrollment,ifelse(yr2006_isced_7_enrollment>0,yr2006_isced_7_enrollment,ifelse(yr2005_isced_7_enrollment>0,yr2005_isced_7_enrollment,ifelse(yr2004_isced_7_enrollment>0,yr2004_isced_7_enrollment,ifelse(yr2003_isced_7_enrollment>0,yr2003_isced_7_enrollment,ifelse(yr2002_isced_7_enrollment>0,yr2002_isced_7_enrollment,ifelse(yr2001_isced_7_enrollment>0,yr2001_isced_7_enrollment,ifelse(yr2000_isced_7_enrollment>0,yr2000_isced_7_enrollment,0))))))))))))))))))))) %>%
+  mutate(isced_8_enrollment=ifelse(yr2019_isced_8_enrollment>0,yr2019_isced_8_enrollment,ifelse(yr2018_isced_8_enrollment>0,yr2018_isced_8_enrollment,ifelse(yr2017_isced_8_enrollment>0,yr2017_isced_8_enrollment,ifelse(yr2016_isced_8_enrollment>0,yr2016_isced_8_enrollment,ifelse(yr2015_isced_8_enrollment>0,yr2015_isced_8_enrollment,ifelse(yr2014_isced_8_enrollment>0,yr2014_isced_8_enrollment,ifelse(yr2013_isced_8_enrollment>0,yr2013_isced_8_enrollment,ifelse(yr2012_isced_8_enrollment>0,yr2012_isced_8_enrollment,ifelse(yr2011_isced_8_enrollment>0,yr2011_isced_8_enrollment,ifelse(yr2010_isced_8_enrollment>0,yr2010_isced_8_enrollment,ifelse(yr2009_isced_8_enrollment>0,yr2009_isced_8_enrollment,ifelse(yr2008_isced_8_enrollment>0,yr2008_isced_8_enrollment,ifelse(yr2007_isced_8_enrollment>0,yr2007_isced_8_enrollment,ifelse(yr2006_isced_8_enrollment>0,yr2006_isced_8_enrollment,ifelse(yr2005_isced_8_enrollment>0,yr2005_isced_8_enrollment,ifelse(yr2004_isced_8_enrollment>0,yr2004_isced_8_enrollment,ifelse(yr2003_isced_8_enrollment>0,yr2003_isced_8_enrollment,ifelse(yr2002_isced_8_enrollment>0,yr2002_isced_8_enrollment,ifelse(yr2001_isced_8_enrollment>0,yr2001_isced_8_enrollment,ifelse(yr2000_isced_8_enrollment>0,yr2000_isced_8_enrollment,0)))))))))))))))))))))
+```
+
+next step is to select out only sole values + reference year
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
