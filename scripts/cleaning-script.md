@@ -735,38 +735,12 @@ university_enrollment_data <- university_enrollment_data %>%
   filter_at(vars(country),all_vars(!. %in% c("Arab World","Caribbean small states","Central Europe and the Baltics","Early-demographic dividend","East Asia & Pacific","East Asia & Pacific (excluding high income)","East Asia & Pacific (IDA & IBRD countries)","Euro area","Europe & Central Asia","Europe & Central Asia (excluding high income)","Europe & Central Asia (IDA & IBRD countries)","European Union","Fragile and conflict affected situations","Global Partnership for Education","Heavily indebted poor countries (HIPC)","High income","IBRD only","IDA & IBRD total","IDA blend","IDA only","IDA total","Late-demographic dividend","Latin America & Caribbean","Latin America & Caribbean (excluding high income)","Latin America & the Caribbean (IDA & IBRD countries)","Least developed countries: UN classification","Low & middle income","Low income","Lower middle income","Middle East & North Africa","Middle East & North Africa (excluding high income)","Middle East & North Africa (IDA & IBRD countries)","Middle income","North America","OECD members","Other small states","Pacific island small states","Post-demographic dividend","Pre-demographic dividend","Small states","South Asia","South Asia (IDA & IBRD)","Sub-Saharan Africa","Sub-Saharan Africa (excluding high income)","Sub-Saharan Africa (IDA & IBRD countries)","Upper middle income","World")))
 ```
 
-With these rows removed, we can begin generating the columns that pull
-the values.
+With these rows removed, we can begin now generate an additional set of
+columns that retrieve the values associated with all indicators of
+interest for the identified reference years.
 
-``` r
-university_enrollment_data 
-```
-
-    ## # A tibble: 169 × 127
-    ## # Rowwise: 
-    ##    country     yr2019_…¹ yr201…² yr201…³ yr201…⁴ yr201…⁵ yr201…⁶ yr201…⁷ yr201…⁸
-    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-    ##  1 Afghanistan         0  3.80e7       0      0        0     0       550  3.72e7
-    ##  2 Albania             0  2.87e6  232597  89231    43749  1865      4860  2.87e6
-    ##  3 Algeria             0  4.31e7       0      0        0     0         0  4.22e7
-    ##  4 Andorra             0  7.7 e4       0    554.      35    23.5       0  7.70e4
-    ##  5 Argentina           0  4.49e7       0      0        0     0     12390  4.45e7
-    ##  6 Armenia             0  2.96e6  178853  69622    10855   985      4230  2.95e6
-    ##  7 Aruba               0  1.06e5       0      0        0     0         0  1.06e5
-    ##  8 Australia           0  2.53e7       0      0        0     0     53230  2.50e7
-    ##  9 Austria             0  8.86e6       0      0        0     0     49310  8.84e6
-    ## 10 Azerbaijan          0  1.00e7  692066 160631    20954  2626      4050  9.94e6
-    ## # … with 159 more rows, 118 more variables:
-    ## #   yr2018_school_aged_population <dbl>, yr2018_isced_6_enrollment <dbl>,
-    ## #   yr2018_isced_7_enrollment <dbl>, yr2018_isced_8_enrollment <dbl>,
-    ## #   yr2017_per_capita_gni <dbl>, yr2017_national_population <dbl>,
-    ## #   yr2017_school_aged_population <dbl>, yr2017_isced_6_enrollment <dbl>,
-    ## #   yr2017_isced_7_enrollment <dbl>, yr2017_isced_8_enrollment <dbl>,
-    ## #   yr2016_per_capita_gni <dbl>, yr2016_national_population <dbl>, …
-
-We will now begin the columns that pull the actual values (NOTE THAT
-THIS DEVIATES FROM ORIGINAL PLAN - ACTUALLY JUST TAKES THE MOST RECENT
-VALUE FOR EAACH INDICATOR AT THE. COUNTRY LEVEL)
+(NOTE THAT THIS DEVIATES FROM ORIGINAL PLAN - ACTUALLY JUST TAKES THE
+MOST RECENT VALUE FOR EAACH INDICATOR AT THE. COUNTRY LEVEL)
 
 ``` r
 university_enrollment_data <- university_enrollment_data %>% 
@@ -778,7 +752,148 @@ university_enrollment_data <- university_enrollment_data %>%
   mutate(isced_8_enrollment=ifelse(yr2019_isced_8_enrollment>0,yr2019_isced_8_enrollment,ifelse(yr2018_isced_8_enrollment>0,yr2018_isced_8_enrollment,ifelse(yr2017_isced_8_enrollment>0,yr2017_isced_8_enrollment,ifelse(yr2016_isced_8_enrollment>0,yr2016_isced_8_enrollment,ifelse(yr2015_isced_8_enrollment>0,yr2015_isced_8_enrollment,ifelse(yr2014_isced_8_enrollment>0,yr2014_isced_8_enrollment,ifelse(yr2013_isced_8_enrollment>0,yr2013_isced_8_enrollment,ifelse(yr2012_isced_8_enrollment>0,yr2012_isced_8_enrollment,ifelse(yr2011_isced_8_enrollment>0,yr2011_isced_8_enrollment,ifelse(yr2010_isced_8_enrollment>0,yr2010_isced_8_enrollment,ifelse(yr2009_isced_8_enrollment>0,yr2009_isced_8_enrollment,ifelse(yr2008_isced_8_enrollment>0,yr2008_isced_8_enrollment,ifelse(yr2007_isced_8_enrollment>0,yr2007_isced_8_enrollment,ifelse(yr2006_isced_8_enrollment>0,yr2006_isced_8_enrollment,ifelse(yr2005_isced_8_enrollment>0,yr2005_isced_8_enrollment,ifelse(yr2004_isced_8_enrollment>0,yr2004_isced_8_enrollment,ifelse(yr2003_isced_8_enrollment>0,yr2003_isced_8_enrollment,ifelse(yr2002_isced_8_enrollment>0,yr2002_isced_8_enrollment,ifelse(yr2001_isced_8_enrollment>0,yr2001_isced_8_enrollment,ifelse(yr2000_isced_8_enrollment>0,yr2000_isced_8_enrollment,0)))))))))))))))))))))
 ```
 
-next step is to select out only sole values + reference year
+With these columns added to the dataset, we can now remove the
+year-specific columns and abbreviate our dataset to the
+indicator-specific values associated with the most recent year for which
+there is data.
+
+``` r
+university_enrollment_data <- university_enrollment_data %>%
+  select(country,national_population,national_population_ref_year,school_aged_population,school_aged_population_ref_year,per_capita_gni,per_capita_gni_ref_year,isced_6_enrollment,isced_6_ref_year,isced_7_enrollment,isced_7_ref_year,isced_8_enrollment,isced_8_ref_year)
+university_enrollment_data
+```
+
+    ## # A tibble: 169 × 13
+    ## # Rowwise: 
+    ##    country     nationa…¹ natio…² schoo…³ schoo…⁴ per_c…⁵ per_c…⁶ isced…⁷ isced…⁸
+    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Afghanistan  38042000    2019 3826080    2018     550    2018  3.66e5    2018
+    ##  2 Albania       2867000    2019  232597    2019    4860    2018  8.92e4    2019
+    ##  3 Algeria      43053000    2019 3116237    2018    3920    2017  9.96e5    2018
+    ##  4 Andorra         77000    2019       0       0       0       0  5.54e2    2019
+    ##  5 Argentina    44901000    2019 3491568    2017   12390    2018  2.21e6    2017
+    ##  6 Armenia       2958000    2019  178853    2019    4230    2018  6.96e4    2019
+    ##  7 Aruba          106000    2019    7635    2016   23630    2017  8.48e2    2016
+    ##  8 Australia    25303000    2019 1555767    2018   53230    2018  9.99e5    2018
+    ##  9 Austria       8865000    2019  496255    2018   49310    2018  1.99e5    2018
+    ## 10 Azerbaijan   10032000    2019  692066    2019    4050    2018  1.61e5    2019
+    ## # … with 159 more rows, 4 more variables: isced_7_enrollment <dbl>,
+    ## #   isced_7_ref_year <dbl>, isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
+    ## #   and abbreviated variable names ¹​national_population,
+    ## #   ²​national_population_ref_year, ³​school_aged_population,
+    ## #   ⁴​school_aged_population_ref_year, ⁵​per_capita_gni,
+    ## #   ⁶​per_capita_gni_ref_year, ⁷​isced_6_enrollment, ⁸​isced_6_ref_year
+
+Previoulsy, we identified instances of missing data pertaining to
+enrollment in ISCED 6, 7, and 8 programs, but we did not do the same for
+the remaining EdStats indicators, which include the renamed
+`national_population` , `school_aged_population`, and `per_capita_gni`
+variables.
+
+``` r
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(national_population==0) %>%
+  distinct(country)
+```
+
+    ## # A tibble: 0 × 1
+    ## # Rowwise: 
+    ## # … with 1 variable: country <chr>
+
+``` r
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(school_aged_population==0) %>%
+  distinct(country)
+```
+
+    ## # A tibble: 4 × 1
+    ## # Rowwise: 
+    ##   country
+    ##   <chr>  
+    ## 1 Andorra
+    ## 2 Japan  
+    ## 3 Lebanon
+    ## 4 Monaco
+
+``` r
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(per_capita_gni==0) %>%
+  distinct(country)
+```
+
+    ## # A tibble: 6 × 1
+    ## # Rowwise: 
+    ##   country                  
+    ##   <chr>                    
+    ## 1 Andorra                  
+    ## 2 Curacao                  
+    ## 3 Korea, Dem. People's Rep.
+    ## 4 Monaco                   
+    ## 5 San Marino               
+    ## 6 Sint Maarten (Dutch part)
+
+Based on this, we can see that there are a few missing-data problems we
+may have to address later.
+
+In the meantime, we can focus on constructing two new columns: (1) one
+that reflects total enrollment across all ISCED 6, 7, and 8 programs
+(i.e., `university_enrollment`), (2) another that reflects the
+proportion of the national population that is school aged
+(i.e.,`proportion_school_aged`), and (3) one that reflects the
+proportion of the school-aged population that is enrolled in ISCED 6, 7,
+or 8 programs (i.e., `proportion_school_aged_enrolled`)
+
+``` r
+university_enrollment_data <- university_enrollment_data %>%
+  mutate(university_enrollment=isced_6_enrollment+isced_7_enrollment+isced_8_enrollment) %>%
+  mutate(proportion_school_aged=school_aged_population/national_population) %>%
+  mutate(proportion_school_aged_enrolled=university_enrollment/school_aged_population)
+```
+
+(Need to add code checking reference year alignment across indicators)
+
+While there are still unresolved missing-data issues, we will defer on
+how we will address them until after our spatial join.
+
+### Spatially Joining Our Dietary-Footprint and University-Enrollment Data
+
+Now that the three parent datasets are in a format that align with each
+other and the needs of our analyses, we can begin the necessary
+preparations for our spatial join.
+
+To do this, we will first need to identify inconsistencies in how
+countries are named and represented between the three three data
+sources. We will begin by examining the countries that are listed in
+`impact_model_data` without a one-to-one match in
+`university_enrollment_data`.
+
+``` r
+anti_join(impact_model_data,university_enrollment_data,by="country") %>%
+  select(country)
+```
+
+    ## # A tibble: 41 × 1
+    ##    country                           
+    ##    <chr>                             
+    ##  1 Paraguay                          
+    ##  2 Bolivia (Plurinational State of)  
+    ##  3 Central African Republic          
+    ##  4 China, Hong Kong SAR              
+    ##  5 Venezuela (Bolivarian Republic of)
+    ##  6 United States of America          
+    ##  7 Kyrgyzstan                        
+    ##  8 China, Macao SAR                  
+    ##  9 Republic of Korea                 
+    ## 10 French Polynesia                  
+    ## # … with 31 more rows
+
+Of the 41 instances where an indexed country appeared in
+`impact_mode_data` but not `university_enrollment_data`, x were due to a
+simple mismatch in how countries were named. We correct this
+misalignment using the following:
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
