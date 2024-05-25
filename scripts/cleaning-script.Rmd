@@ -502,7 +502,14 @@ To do this, we will first need to identify inconsistencies in how countries are 
 anti_join(impact_model_data,university_enrollment_data,by="country") %>%
   select(country)
 ```
-Of the 41 instances where an indexed country appeared in `impact_mode_data` but not `university_enrollment_data`, x were due to a simple mismatch in how countries were named. We correct this misalignment using the following:
+Of the 41 instances where an indexed country appeared in `impact_model_data` but not `university_enrollment_data`, x were due to a simple mismatch in how countries were named. We correct this misalignment using the following:
+
+
+
+
+Another y cases were a result of 
+
+Finally, the last z cases refer to the countries indexed within `impact_model_data` but not `university_enrollment_data`. 
 
 
 
