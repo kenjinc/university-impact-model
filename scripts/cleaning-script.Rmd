@@ -496,15 +496,49 @@ While there are still unresolved missing-data issues, we will defer on how we wi
 
 Now that the three parent datasets are in a format that align with each other and the needs of our analyses, we can begin the necessary preparations for our spatial join. 
 
-To do this, we will first need to identify inconsistencies in how countries are named and represented between the three three data sources. We will begin by examining the countries that are listed in `impact_model_data` without a one-to-one match in `university_enrollment_data`.
+To do this, we will first need to identify inconsistencies in how countries are named and represented between the three three data sources. We will begin by examining the countries that are listed in `impact_model_data` without a one-to-one match in `university_enrollment_data`, and vice versa.
 
 ```{r}
 anti_join(impact_model_data,university_enrollment_data,by="country") %>%
   select(country)
 ```
-Of the 41 instances where an indexed country appeared in `impact_model_data` but not `university_enrollment_data`, x were due to a simple mismatch in how countries were named. We correct this misalignment using the following:
 
+```{r}
+anti_join(university_enrollment_data,impact_model_data,by="country") %>%
+  select(country)
+```
 
+Based on these two generated lists, we can see that there are three types of  cases that need to be addressed: (1) the x instances where there is a mismatch in how a country is indexed across the two data sources, (2) the y instances where a country appears in just one of the two data sources because it was previously removed due to insufficient data, and (3) the z instances where a country appears in just one of the two data sources because it was not originally included in one of the two data sources' list of included countries.
+
+In the case of `impact_model_data`, we removed 17 countries due to observed differences in the countries being reported between the dietary-footprint data containing the EAT-Lancet diet estimates and the data containing the remaining dietary scenarios. More specifically, the named countries of Bermuda, Brunei Darussalam, the former Yugoslav Republic of Macedonia, Mongolia, Cuba, United Arab Emirates, Guinea, Djibouti, Gabon, Trinidad and Tobago, Saint Kitts and Nevis, Saint Vincent and the Greadines, Saint Lucia, Sierra Leone, Bangladesh, Grenada, and Nigeria all had incomplete data because they appeared in only one of the two required data sources. 
+
+In `university_enrollment_data`, on the other hand, we removed a total of 103 rows, either because they had no available university-enrollment data (i.e., the sum of `isced_6`, `isced_7`, and `isced_8` enrollment was 0) or because they were representing aggregate groupings of countries. 
+
+These rows included American Samoa, Angola, Anguilla, Antigua and Barbuda, The Bahamas, Bolivia, British Virgin Islands, the aggregate of Lending category not classified and the countries of 
+
+, of the 41 instances where an indexed country appeared in `impact_model_data` but not `university_enrollment_data`, x were due to a simple mismatch in how countries were named. 
+
+o correct this misalignment, we use the following to 
+
+```{r}
+university_enrollment_data %>%
+  mutate(across(country,str_replace,"Congo, Dem. Rep.","Congo")) %>%
+  mutate(across(country,str_replace,"Egypt, Arab Rep.","Egypt")) %>%
+  mutate(across(country,str_replace,"Hong Kong SAR, China","China, Hong Kong SAR")) %>%
+  mutate(across(country,str_replace,"Iran, Isalmic Rep.","Iran (Islamic Republic of)")) %>%
+  mutate(across(country,str_replace,"Krgyz Republic","Kyrgyzstan")) %>%
+  mutate(across(country,str_replace,"Korea, Rep.","Republic of Korea")) %>%
+  mutate(across(country,str_replace,"Macao SAR, China","China, Macao SAR")) %>%
+  mutate(across(country,str_replace,"Moldova","Republic of Moldova")) %>%
+  mutate(across(country,str_replace,"North Macedonia","The former Yugoslav Republic of Macedonia")) %>%
+  mutate(across(country,str_replace,"Czech Republic","Czechia")) %>%
+  mutate(across(country,str_replace,"Slovak Republic","Slovakia")) %>%
+  mutate(across(country,str_replace,"Tanzania","United Republic of Tanzania")) %>%
+  mutate(across(country,str_replace,"United States","United States of America")) %>%
+  mutate(across(country,str_replace,"Venezuela, RB","Venezuela (Bolivarian Republic of)")) %>%
+  mutate(across(country,str_replace,"Yemen, Rep.","Yemen")) %>%
+  mutate(across(country,str_replace,"CÃ´te d'Ivoire","Cote d'Ivoire")) 
+```
 
 
 Another y cases were a result of 

@@ -868,7 +868,7 @@ To do this, we will first need to identify inconsistencies in how
 countries are named and represented between the three three data
 sources. We will begin by examining the countries that are listed in
 `impact_model_data` without a one-to-one match in
-`university_enrollment_data`.
+`university_enrollment_data`, and vice versa.
 
 ``` r
 anti_join(impact_model_data,university_enrollment_data,by="country") %>%
@@ -890,10 +890,109 @@ anti_join(impact_model_data,university_enrollment_data,by="country") %>%
     ## 10 French Polynesia                  
     ## # … with 31 more rows
 
-Of the 41 instances where an indexed country appeared in
-`impact_mode_data` but not `university_enrollment_data`, x were due to a
-simple mismatch in how countries were named. We correct this
-misalignment using the following:
+``` r
+anti_join(university_enrollment_data,impact_model_data,by="country") %>%
+  select(country)
+```
+
+    ## # A tibble: 56 × 1
+    ## # Rowwise: 
+    ##    country         
+    ##    <chr>           
+    ##  1 Andorra         
+    ##  2 Aruba           
+    ##  3 Bahrain         
+    ##  4 Bhutan          
+    ##  5 Burundi         
+    ##  6 Chad            
+    ##  7 China           
+    ##  8 Comoros         
+    ##  9 Congo, Dem. Rep.
+    ## 10 Congo, Rep.     
+    ## # … with 46 more rows
+
+Based on these two generated lists, we can see that there are three
+types of cases that need to be addressed: (1) the x instances where
+there is a mismatch in how a country is indexed across the two data
+sources, (2) the y instances where a country appears in just one of the
+two data sources because it was previously removed due to insufficient
+data, and (3) the z instances where a country appears in just one of the
+two data sources because it was not originally included in one of the
+two data sources’ list of included countries.
+
+In the case of `impact_model_data`, we removed 17 countries due to
+observed differences in the countries being reported between the
+dietary-footprint data containing the EAT-Lancet diet estimates and the
+data containing the remaining dietary scenarios. More specifically, the
+named countries of Bermuda, Brunei Darussalam, the former Yugoslav
+Republic of Macedonia, Mongolia, Cuba, United Arab Emirates, Guinea,
+Djibouti, Gabon, Trinidad and Tobago, Saint Kitts and Nevis, Saint
+Vincent and the Greadines, Saint Lucia, Sierra Leone, Bangladesh,
+Grenada, and Nigeria all had incomplete data because they appeared in
+only one of the two required data sources.
+
+In `university_enrollment_data`, on the other hand, we removed a total
+of 103 rows, either because they had no available university-enrollment
+data (i.e., the sum of `isced_6`, `isced_7`, and `isced_8` enrollment
+was 0) or because they were representing aggregate groupings of
+countries.
+
+These rows included American Samoa, Angola, Anguilla, Antigua and
+Barbuda, The Bahamas, Bolivia, British Virgin Islands, the aggregate of
+Lending category not classified and the countries of
+
+, of the 41 instances where an indexed country appeared in
+`impact_model_data` but not `university_enrollment_data`, x were due to
+a simple mismatch in how countries were named.
+
+o correct this misalignment, we use the following to
+
+``` r
+university_enrollment_data %>%
+  mutate(across(country,str_replace,"Congo, Dem. Rep.","Congo")) %>%
+  mutate(across(country,str_replace,"Egypt, Arab Rep.","Egypt")) %>%
+  mutate(across(country,str_replace,"Hong Kong SAR, China","China, Hong Kong SAR")) %>%
+  mutate(across(country,str_replace,"Iran, Isalmic Rep.","Iran (Islamic Republic of)")) %>%
+  mutate(across(country,str_replace,"Krgyz Republic","Kyrgyzstan")) %>%
+  mutate(across(country,str_replace,"Korea, Rep.","Republic of Korea")) %>%
+  mutate(across(country,str_replace,"Macao SAR, China","China, Macao SAR")) %>%
+  mutate(across(country,str_replace,"Moldova","Republic of Moldova")) %>%
+  mutate(across(country,str_replace,"North Macedonia","The former Yugoslav Republic of Macedonia")) %>%
+  mutate(across(country,str_replace,"Czech Republic","Czechia")) %>%
+  mutate(across(country,str_replace,"Slovak Republic","Slovakia")) %>%
+  mutate(across(country,str_replace,"Tanzania","United Republic of Tanzania")) %>%
+  mutate(across(country,str_replace,"United States","United States of America")) %>%
+  mutate(across(country,str_replace,"Venezuela, RB","Venezuela (Bolivarian Republic of)")) %>%
+  mutate(across(country,str_replace,"Yemen, Rep.","Yemen")) %>%
+  mutate(across(country,str_replace,"CÃ´te d'Ivoire","Cote d'Ivoire")) 
+```
+
+    ## # A tibble: 169 × 16
+    ## # Rowwise: 
+    ##    country     nationa…¹ natio…² schoo…³ schoo…⁴ per_c…⁵ per_c…⁶ isced…⁷ isced…⁸
+    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Afghanistan  38042000    2019 3826080    2018     550    2018  3.66e5    2018
+    ##  2 Albania       2867000    2019  232597    2019    4860    2018  8.92e4    2019
+    ##  3 Algeria      43053000    2019 3116237    2018    3920    2017  9.96e5    2018
+    ##  4 Andorra         77000    2019       0       0       0       0  5.54e2    2019
+    ##  5 Argentina    44901000    2019 3491568    2017   12390    2018  2.21e6    2017
+    ##  6 Armenia       2958000    2019  178853    2019    4230    2018  6.96e4    2019
+    ##  7 Aruba          106000    2019    7635    2016   23630    2017  8.48e2    2016
+    ##  8 Australia    25303000    2019 1555767    2018   53230    2018  9.99e5    2018
+    ##  9 Austria       8865000    2019  496255    2018   49310    2018  1.99e5    2018
+    ## 10 Azerbaijan   10032000    2019  692066    2019    4050    2018  1.61e5    2019
+    ## # … with 159 more rows, 7 more variables: isced_7_enrollment <dbl>,
+    ## #   isced_7_ref_year <dbl>, isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
+    ## #   university_enrollment <dbl>, proportion_school_aged <dbl>,
+    ## #   proportion_school_aged_enrolled <dbl>, and abbreviated variable names
+    ## #   ¹​national_population, ²​national_population_ref_year,
+    ## #   ³​school_aged_population, ⁴​school_aged_population_ref_year, ⁵​per_capita_gni,
+    ## #   ⁶​per_capita_gni_ref_year, ⁷​isced_6_enrollment, ⁸​isced_6_ref_year
+
+Another y cases were a result of
+
+Finally, the last z cases refer to the countries indexed within
+`impact_model_data` but not `university_enrollment_data`.
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
