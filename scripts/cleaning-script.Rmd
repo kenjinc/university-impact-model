@@ -1,7 +1,7 @@
 ---
 title: "Data Cleaning and Aggregation"
 output: github_document
-date: "Last updated: April 29, 2024"
+date: "Last updated: May 29, 2024"
 ---
 
 ```{r setup, include=FALSE}
@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(ggpubr)
 ```
+
 ## Data Loading
 
 There are three principal data inputs needed to generate our impact model:
@@ -273,7 +274,7 @@ impact_model_data <- impact_model_data %>%
 Finally, we (optionally) remove the 17 countries with incomplete data.
 
 ```{r}
-impact_modeL_data <- impact_model_data %>% 
+impact_model_data <- impact_model_data %>% 
   filter(!country=="Bermuda") %>%
   filter(!country=="Brunei Darussalam") %>%
   filter(!country=="The former Yugoslav Republic of Macedonia") %>%
@@ -291,7 +292,6 @@ impact_modeL_data <- impact_model_data %>%
   filter(!country=="Bangladesh") %>%
   filter(!country=="Grenada") %>%
   filter(!country=="Nigeria") 
-impact_modeL_data
 ```
 
 ## Adjusting the University-Enrollment Data
@@ -452,10 +452,9 @@ With these columns added to the dataset, we can now remove the year-specific col
 ```{r}
 university_enrollment_data <- university_enrollment_data %>%
   select(country,national_population,national_population_ref_year,school_aged_population,school_aged_population_ref_year,per_capita_gni,per_capita_gni_ref_year,isced_6_enrollment,isced_6_ref_year,isced_7_enrollment,isced_7_ref_year,isced_8_enrollment,isced_8_ref_year)
-university_enrollment_data
 ```
 
-Previoulsy, we identified instances of missing data pertaining to enrollment in ISCED 6, 7, and 8 programs, but we did not do the same for the remaining EdStats indicators, which include the renamed `national_population` , `school_aged_population`, and `per_capita_gni` variables.
+Previously, we identified instances of missing data pertaining to enrollment in ISCED 6, 7, and 8 programs, but we did not do the same for the remaining EdStats indicators, which include the renamed `national_population` , `school_aged_population`, and `per_capita_gni` variables.
 
 ```{r}
 university_enrollment_data %>%
@@ -492,7 +491,7 @@ university_enrollment_data <- university_enrollment_data %>%
 
 While there are still unresolved missing-data issues, we will defer on how we will address them until after our spatial join. 
 
-### Spatially Joining Our Dietary-Footprint and University-Enrollment Data
+## Spatially Joining Our Dietary-Footprint and University-Enrollment Data
 
 Now that the three parent datasets are in a format that align with each other and the needs of our analyses, we can begin the necessary preparations for our spatial join. 
 
@@ -508,46 +507,183 @@ anti_join(university_enrollment_data,impact_model_data,by="country") %>%
   select(country)
 ```
 
-Based on these two generated lists, we can see that there are three types of  cases that need to be addressed: (1) the x instances where there is a mismatch in how a country is indexed across the two data sources, (2) the y instances where a country appears in just one of the two data sources because it was previously removed due to insufficient data, and (3) the z instances where a country appears in just one of the two data sources because it was not originally included in one of the two data sources' list of included countries.
+Based on these two generated lists, we can see that there are three types of  cases that need to be addressed: (1) the `x` instances where there is a mismatch in how a country is indexed across the two data sources, (2) the `y` instances where a country appears in just one of the two data sources because it was previously removed due to insufficient data, and (3) the `z` instances where a country appears in just one of the two data sources because it was not originally included in one of the two data sources' list of included countries.
 
-In the case of `impact_model_data`, we removed 17 countries due to observed differences in the countries being reported between the dietary-footprint data containing the EAT-Lancet diet estimates and the data containing the remaining dietary scenarios. More specifically, the named countries of Bermuda, Brunei Darussalam, the former Yugoslav Republic of Macedonia, Mongolia, Cuba, United Arab Emirates, Guinea, Djibouti, Gabon, Trinidad and Tobago, Saint Kitts and Nevis, Saint Vincent and the Greadines, Saint Lucia, Sierra Leone, Bangladesh, Grenada, and Nigeria all had incomplete data because they appeared in only one of the two required data sources. 
+In the case of `impact_model_data`, we removed 17 rows due to observed differences in the countries being reported between the dietary-footprint data containing the EAT-Lancet diet estimates and the data containing the remaining dietary scenarios. More specifically, the named countries of Bermuda, Brunei Darussalam, the former Yugoslav Republic of Macedonia, Mongolia, Cuba, United Arab Emirates, Guinea, Djibouti, Gabon, Trinidad and Tobago, Saint Kitts and Nevis, Saint Vincent and the Grenadines, Saint Lucia, Sierra Leone, Bangladesh, Grenada, and Nigeria all had incomplete data because they appeared in only one of the two required data sources. 
 
-In `university_enrollment_data`, on the other hand, we removed a total of 103 rows, either because they had no available university-enrollment data (i.e., the sum of `isced_6`, `isced_7`, and `isced_8` enrollment was 0) or because they were representing aggregate groupings of countries. 
+In `university_enrollment_data`, on the other hand, we removed a total of 103 rows, either because they had no available university-enrollment data (i.e., the sum of `isced_6`, `isced_7`, and `isced_8` enrollment was equal to 0) or because they represented aggregate groupings of countries rather than individual nation-states.
 
-These rows included American Samoa, Angola, Anguilla, Antigua and Barbuda, The Bahamas, Bolivia, British Virgin Islands, the aggregate of Lending category not classified and the countries of 
+For the former scenario, this resulted in the removal of the following 55 rows: American Samoa, Angola, Anguilla, Antigua and Barbuda, The Bahamas, Bolivia, British Virgin Islands, Cayman Islands, Central African Republic, Channel Islands, Cook Islands, Djibouti, Dominica, Equatorial Guinea, Faroe Islands, French Polynesia, Gabon, The Gambia, Gibraltar, Greenland, Guam, Guinea-Bissau, Guyana, Haiti, Isle of Man, Kiribati, Kosovo, Liberia, Mayotte, Federated States of Micronesia, Montserraat, Nauru, Netherlands Antilles, New Caledonia, Nicaragua, Niue, Northern Mariana Islands, Palau, Papua New Guinea, Paraguay, Sao Tome and Principe, Sierra Leone, Solomon Islands, Somalia, South Sudan, St, Martin, St. Vincent and the Grenadines, Suriname, Timor-Leste, Tokelau, Tonga, Tuvualu, Vanuatu, Virgin Islands, and Zambia.
 
-, of the 41 instances where an indexed country appeared in `impact_model_data` but not `university_enrollment_data`, x were due to a simple mismatch in how countries were named. 
+The latter scenario, on the other hand, resulted in the removal of the following 48 rows: Arab World, Caribbean small states, Central Europe and the Baltics, Early-demographic dividend, East Asia and Pacific, East Asia and Pacific (excluding high income), East Asia and Pacific (IDA and IBRD countries), Euro area, Europe and Central Asia, Europe and Central Asia (excluding high income), Europe and Central Asia (IDA and IBRD countries), European Union, Fragile and conflict affected situations, Global Partnership for Education, Heavily indebted poor countries (HIPC), High income, IBRD only, IDA and IBRD total, IDA blend, IDA only, IDA total, Late-demogaphic dividend, Latin America and Caribbean, Latin American and Caribbean (excluding high income), Latin America and Caribbean (IDA and IBRD countries), Least developed countries: UN classification, Low and middle income, Low income, Lower middle income, Middle East and North Africa, Middle East and North Africa (excluding high income), Middle East and North Africa (IDA and IBRD countries), Middle income, North America, OECD members, Other small states, Pacific island small states, Post-demographic dividend, Pre-demographic dividend, Small states, South Asia, South Asia (IDA and IBRD countries), Sub-Saharan Africa, Sub-Saharan Africa (IDA and IBRD countries), Sub-Saharan Africa (excluding high income), Upper middle income, and World. 
 
-o correct this misalignment, we use the following to 
+Because the data will be incomplete for any country that is included in one data source but not the other, we can continue with this cleaning process by removing the rows that appear in the university-enrollment or dietary-footprint data but not the other. 
+
+First, we filter out the 17 rows that were previously removed from `university_enrollment_data` and appear in `impact_model_data`.
+
 
 ```{r}
-university_enrollment_data %>%
-  mutate(across(country,str_replace,"Congo, Dem. Rep.","Congo")) %>%
+impact_model_data <- impact_model_data %>%
+  filter_at(vars(country),all_vars(!. %in% c("Antigua and Barbuda","Bahamas","Bolivia (Plurinational State of)","Central African Republic","Djibouti","Dominica","French Polynesia","Gabon","Gambia","Guyana","Kiribati","New Caledonia","Nicaragua","Paraguay","Sao Tome and Principe","Sierra Leone","Solomon Islands","Saint Vincent and the Grenadines","Suriname","Vanuatu","Zambia")))
+```
+
+Next, we perform the inverse by filtering out the 13 rows that were previously removed from `impact_model_data` and appear in `university_enrollment_data`.
+
+```{r}
+university_enrollment_data <- university_enrollment_data %>%
+  filter_at(vars(country),all_vars(!. %in% c("Bermuda","Brunei Darussalam","North Macedonia","Mongolia","Cuba","United Arab Emirates","Guinea","Trinidad and Tobago","St. Kitts and Nevis","St. Lucia","Bangladesh","Grenada","Nigeria")))
+```
+
+With these two steps complete, we can now do a progress check to see how the two data sources are aligning: 
+
+```{r}
+anti_join(university_enrollment_data,impact_model_data,by="country") %>%
+  select(country)
+```
+
+```{r}
+anti_join(impact_model_data,university_enrollment_data,by="country") %>%
+  select(country) %>% arrange(country)
+```
+ 
+Given the cases that are left, we can see that there are 16 instances where the countries appearing in `impact_model_data` are indexed differently than in `university_enrollment_data`. For the time-being, we will address this misalignment by changing how the countries are named in `university_enrollment_data` so that they match the  conventions used in `impact_model_data`.
+
+With regard to the case of the  was not explicitly clear  which country "Congo" referred to in the `impact_model_data`, but we inferred—based on the population data provided in the data source from which the EAT-Lancet-planetary-health-diet estimates were derived—that this designation mapped on to the Republic of Congo named in `university_enrollment_data` rather than the Democratic Republic of the Congo.
+
+```{r}
+university_enrollment_data <- university_enrollment_data %>%
+  mutate(across(country,str_replace,"Cote d'Ivoire","CÃ´te d'Ivoire")) %>%
+  mutate(across(country,str_replace,"China","China, mainland")) %>%
+  mutate(across(country,str_replace,"Hong Kong SAR, China, mainland","China, Hong Kong SAR")) %>%
+  mutate(across(country,str_replace,"Macao SAR, China, mainland","China, Macao SAR")) %>%
+  mutate(across(country,str_replace,"Congo, Rep.","Congo")) %>%
   mutate(across(country,str_replace,"Egypt, Arab Rep.","Egypt")) %>%
-  mutate(across(country,str_replace,"Hong Kong SAR, China","China, Hong Kong SAR")) %>%
-  mutate(across(country,str_replace,"Iran, Isalmic Rep.","Iran (Islamic Republic of)")) %>%
-  mutate(across(country,str_replace,"Krgyz Republic","Kyrgyzstan")) %>%
+  mutate(across(country,str_replace,"Iran, Islamic Rep.","Iran (Islamic Republic of)")) %>%
+  mutate(across(country,str_replace,"Kyrgyz Republic","Kyrgyzstan")) %>%
   mutate(across(country,str_replace,"Korea, Rep.","Republic of Korea")) %>%
-  mutate(across(country,str_replace,"Macao SAR, China","China, Macao SAR")) %>%
   mutate(across(country,str_replace,"Moldova","Republic of Moldova")) %>%
-  mutate(across(country,str_replace,"North Macedonia","The former Yugoslav Republic of Macedonia")) %>%
-  mutate(across(country,str_replace,"Czech Republic","Czechia")) %>%
   mutate(across(country,str_replace,"Slovak Republic","Slovakia")) %>%
+  mutate(across(country,str_replace,"Turkiye","Turkey")) %>%
   mutate(across(country,str_replace,"Tanzania","United Republic of Tanzania")) %>%
   mutate(across(country,str_replace,"United States","United States of America")) %>%
   mutate(across(country,str_replace,"Venezuela, RB","Venezuela (Bolivarian Republic of)")) %>%
-  mutate(across(country,str_replace,"Yemen, Rep.","Yemen")) %>%
-  mutate(across(country,str_replace,"CÃ´te d'Ivoire","Cote d'Ivoire")) 
+  mutate(across(country,str_replace,"Yemen, Rep.","Yemen")) 
+```
+
+As we can see, this leaves only Taiwan, as the single nation-state that is named in the dietary-footprint data sources, has all the requisite dietary-footprint data, but was not listed in `university_enrollment_data`. 
+
+```{r}
+anti_join(impact_model_data,university_enrollment_data,by="country") %>%
+  select(country) %>% arrange(country)
+```
+
+We will circle back to this case once we have completed with the subsequent step.
+
+In addition to this single case, there are now 37 countries that appear in `university_enrollment_data` without a one-to-one match in `impact_model_data`. At this stage, these represent the countries that have the required university-enrollment data but are unaccounted for in the selected dietary-footprint data sources. 
+
+```{r}
+anti_join(university_enrollment_data,impact_model_data,by="country") %>%
+  select(country) %>% arrange(country)
+```
+
+Because `impact_model_data` is the more limiting of the two data sources (i.e., between `impact_model_data` and `university_enrollment_data`), in that the lack of available LCA estimates for a country are more intractable than the lack of available university-enrollment data, we opt to systematically remove the countries with complete enrollment data that are listed in `impact_model_data` but not `university_enrollment_data` ahead of our join.
+
+```{r}
+university_enrollment_data <- university_enrollment_data %>%
+  filter_at(vars(country),all_vars(!. %in% c("Andorra","Aruba","Bahrain","Bhutan","Burundi","Chad","Comoros","Congo, Dem. Rep.","Curacao","Dominican Republic","Eritrea","Eswatini","Iraq","Korea, Dem. People's Rep.","Lao PDR","Lesotho","Libya","Liechtenstein","Marshall Islands","Monaco","Mozambique","Myanmar","Puerto Rico","Qatar","Samoa","San Marino","Seychelles","Singapore","Sint Maarten (Dutch part)","Sudan","Syrian Arab Republic","Tajikistan","Turkmenistan","Turks and Caicos Islands","Uzbekistan","Vietnam","West Bank and Gaza")))
+```
+
+Conversely, given that there is complete dietary-footprint for Taiwan but an absence of enrollment data, we, instead, opt to systematically add the required enrollment data for this nation-state using estimates derived from official government ministries. 
+
+More specifically, we gathered the requisite national-population (i.e., `national_population`) and per-capita-GNI (i.e., `per_capita_gni`) estimates from the "Principal Figures" [extension](https://ws.dgbas.gov.tw/001/Upload/464/relfile/10320/2397/table_eng(050a).xlsx) available on the "Statistical Tables" [page](https://eng.stat.gov.tw/cp.aspx?n=2334) from Taiwan's Statistical Bureau, using the reference year 2019, which was the most recent year that these indicators were available through EdStats. This yielded values of `23596027` and `26561`, respectively.
+
+In addition, using [data](https://pop-proj.ndc.gov.tw/main_en/Custom_Detail_Search.aspx?t=1&n=175&sms=0) from Taiwan's National Development Council, we also extracted the single-age population estimates in 2019 for the ages of 18 (`256704`), 19 (`305581`), 20 (`282248`), 21 (`266558`), 22 (`321943`), and 23 (`320796`), and summarized these values to derive the total school-aged population (`1753830`).
+
+Finally, we gather the relevant university-enrollment data for the same 2019 reference year from the [statistical indicators](https://english.moe.gov.tw/cp-86-18943-e698b-1.html) provided by Taiwan's Ministry of Education. More specifically, we use Indicator Tables [52](https://stats.moe.gov.tw/files/ebook/indicators/52.pdf) and [24](https://stats.moe.gov.tw/files/ebook/indicators/24.pdf) to directly extract estimates for enrollment in ISCED 7 programs (`168203`) and and ISCED 8 programs (`28510`), and deduce enrollment in ISCED 6 programs (`1016459`) by subtracting the sum of all ISCED 7 and 8 enrollees provided in Table 52 (`196713`) by the total number of college and university students in Taiwan provided in Table 24 (`1213172`).
+
+From here, we can directly extract `university_enrollment` (`1213172`), which represents the total number of students enrolled within ISCED 6-8 programs in that country, and calculate `proportion_school_aged` (`0.07432734333`) and `proportion_school_aged_enrolled` (`0.6917272484`) by dividing the school-aged population by the national population, and dividing the enrollment total by the school-aged population, respectively. 
+
+
+```{r}
+university_enrollment_data <- university_enrollment_data %>%
+  add_row(tibble_row(country="China, Taiwan Province of",
+                     national_population=23596027,
+                     national_population_ref_year=2019,
+                     school_aged_population=1753830,
+                     school_aged_population_ref_year=2019,
+                     per_capita_gni=26561,
+                     per_capita_gni_ref_year=2019,
+                     isced_6_enrollment=1016459,
+                     isced_6_ref_year=2019,
+                     isced_7_enrollment=168203,
+                     isced_7_ref_year=2019,
+                     isced_8_enrollment=28510,
+                     isced_8_ref_year=2019,
+                     university_enrollment=1213172,
+                     proportion_school_aged=0.07432734333,
+                     proportion_school_aged_enrolled=0.6917272484))
 ```
 
 
-Another y cases were a result of 
+With this complete, the country lists across both `university_enrollment_data` and `dietary_footprint_data` should now be the same, both in terms of the land areas they represent and the way in which those land areas are indexed and named. 
 
-Finally, the last z cases refer to the countries indexed within `impact_model_data` but not `university_enrollment_data`. 
+There are a few last things we still have to address, namely the instances where there are either presumed or definite missing data for individual indicators within `university_enrollment_data`, as highlighted below. For now, however, we can continue with our spatial join. 
+
+```{r}
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(national_population==0) %>%
+  distinct(country)
+```
 
 
+```{r}
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(school_aged_population==0) %>%
+  distinct(country)
+```
+```{r}
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(per_capita_gni==0) %>%
+  distinct(country)
+```
+
+```{r}
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(isced_6_enrollment==0) %>%
+  distinct(country)
+```
 
 
+```{r}
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(isced_7_enrollment==0) %>%
+  distinct(country)
+```
+
+```{r}
+university_enrollment_data %>%
+  rowwise() %>%
+  filter(isced_8_enrollment==0) %>%
+  distinct(country)
+```
+
+ Before joining these two cleaned data sources with our shape-file data, we can begin by merging them both together, given that they match according to the country column. 
+ 
+```{r}
+complete_model_data <- left_join(university_enrollment_data,impact_model_data,by="country")
+complete_model_data
+```
+
+From here, we follow a similar process, whereby we must match indexing conventions across the merged `complete_model_data` and the awaiting `shapefile_data`.
+
+```{r}
+anti_join(shapefile_data,complete_model_data,by="country") %>% select(country) %>% distinct(country)
+```
 
 
 
