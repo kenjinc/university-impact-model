@@ -484,7 +484,7 @@ impact_model_data <- impact_model_data %>%
   select(country,diet,attribute,value) %>%
   pivot_wider(names_from=c(diet,attribute),
               values_from=c(value)) %>%
-  select(country,baseline_per_capita_kg_co2e,baseline_adjusted_per_capita_kg_co2e,baseline_oecd_per_capita_kg_co2e,meatless_day_per_capita_kg_co2e,low_red_meat_per_capita_kg_co2e,no_red_meat_per_capita_kg_co2e,no_dairy_per_capita_kg_co2e,pescetarian_per_capita_kg_co2e,lacto_ovo_vegetarian_per_capita_kg_co2e,two_thirds_vegan_per_capita_kg_co2e,vegan_per_capita_kg_co2e)
+  select(country,baseline_per_capita_kg_co2e,baseline_adjusted_per_capita_kg_co2e,baseline_oecd_per_capita_kg_co2e,meatless_day_per_capita_kg_co2e,low_red_meat_per_capita_kg_co2e,no_red_meat_per_capita_kg_co2e,no_dairy_per_capita_kg_co2e,pescetarian_per_capita_kg_co2e,lacto_ovo_vegetarian_per_capita_kg_co2e,eat_lancet_per_capita_kg_co2e,two_thirds_vegan_per_capita_kg_co2e,vegan_per_capita_kg_co2e)
 ```
 
 Finally, we (optionally) remove the 17 countries with incomplete data.
@@ -1291,10 +1291,116 @@ university_impact_model %>% distinct(country)
     ## 10 Belarus    
     ## # … with 110 more rows
 
-Before patching in these specific data points using the same systematic
-process outlined for the case of Taiwan, we can proceed by matching the
-120 land areas represented in the newly merged `university_impact_model`
-and the 258 land areas represented in `shapefile_data`.
+Before making systematized decisions about whether to patch in these
+specific data points for countries with missing data, as we did for
+Taiwan, or omit them from our analyses entirely, we can generate a
+series of additional variables to represent the technical potential of
+shifting university-enrolled populations toward different dietary
+patterns.
+
+We begin this process by generating a dozen variables that scale the per
+capita emissions estimates across each included dietary pattern for each
+country according to its enrollment-population size.
+
+``` r
+university_impact_model <- university_impact_model %>%
+  mutate(baseline_population_kg_co2e=baseline_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(baseline_adjusted_population_kg_co2e=baseline_adjusted_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(baseline_oecd_population_kg_co2e=baseline_oecd_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(meatless_day_population_kg_co2e=meatless_day_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(low_red_meat_population_kg_co2e=low_red_meat_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(no_red_meat_population_kg_co2e=no_red_meat_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(no_dairy_population_kg_co2e=no_dairy_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(pescetarian_population_kg_co2e=pescetarian_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(lacto_ovo_vegetarian_population_kg_co2e=lacto_ovo_vegetarian_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(eat_lancet_population_kg_co2e=eat_lancet_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(two_thirds_vegan_population_kg_co2e=two_thirds_vegan_per_capita_kg_co2e*university_enrollment) %>%
+  mutate(vegan_population_kg_co2e=vegan_per_capita_kg_co2e*university_enrollment)
+```
+
+With these variables in place, we can additionally generate a set of
+variables to represent the reductions that we can expect from shifting a
+country’s university-enrolled population from its observed baseline
+dietary pattern to each of the 11 modeled scenarios. We express these
+reductions both in absolute (i.e., subtracting the modeled estimate from
+the baseline estimate) and relative terms (i.e., taking the absolute
+reduction and dividing that difference by the baseline estimate).
+
+``` r
+university_impact_model <- university_impact_model%>%
+  mutate(baseline_adjusted_population_reduction_kg_co2e=baseline_population_kg_co2e-baseline_adjusted_population_kg_co2e) %>%
+  mutate(baseline_oecd_population_reduction_kg_co2e=baseline_population_kg_co2e-baseline_oecd_population_kg_co2e) %>%
+  mutate(meatless_day_population_reduction_kg_co2e=baseline_population_kg_co2e-meatless_day_population_kg_co2e) %>%
+  mutate(low_red_meat_population_reduction_kg_co2e=baseline_population_kg_co2e-low_red_meat_population_kg_co2e) %>%
+  mutate(no_red_meat_day_population_reduction_kg_co2e=baseline_population_kg_co2e-no_red_meat_population_kg_co2e) %>%
+  mutate(no_dairy_population_reduction_kg_co2e=baseline_population_kg_co2e-no_dairy_population_kg_co2e) %>%
+  mutate(pescetarian_population_reduction_kg_co2e=baseline_population_kg_co2e-pescetarian_population_kg_co2e) %>%
+  mutate(lacto_ovo_vegetarian_population_reduction_kg_co2e=baseline_population_kg_co2e-lacto_ovo_vegetarian_population_kg_co2e) %>%
+  mutate(eat_lancet_population_reduction_kg_co2e=baseline_population_kg_co2e-eat_lancet_population_kg_co2e) %>%
+  mutate(two_thirds_vegan_population_reduction_kg_co2e=baseline_population_kg_co2e-two_thirds_vegan_population_kg_co2e) %>%
+  mutate(vegan_population_reduction_kg_co2e=baseline_population_kg_co2e-vegan_population_kg_co2e) %>%
+  mutate(baseline_adjusted_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-baseline_adjusted_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(baseline_oecd_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-baseline_oecd_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(meatless_day_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-meatless_day_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(low_red_meat_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-low_red_meat_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(no_red_meat_day_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-no_red_meat_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(no_dairy_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-no_dairy_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(pescetarian_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-pescetarian_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(lacto_ovo_vegetarian_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-lacto_ovo_vegetarian_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(eat_lancet_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-eat_lancet_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(two_thirds_vegan_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-two_thirds_vegan_population_kg_co2e)/baseline_population_kg_co2e) %>%
+  mutate(vegan_population_percent_reduction_kg_co2e=(baseline_population_kg_co2e-vegan_population_kg_co2e)/baseline_population_kg_co2e)
+```
+
+With these new variables now newly incorporated into
+`university_impact_model`, we can now proceed by making the final
+preparations needed ahead of our spatial join. More specifically, we
+will first need to decide how we want to address the rows we had
+previously identified that have missing data for indicator-specific
+variables.
+
+These include the two countries with no available data for
+`school_aged_population` (i.e., Japan and Lebanon), the eight countries
+with no available data for `isced_6_enrollment` (i.e., Barbados, Benin,
+Fiji, Malawi, Uganda, Uruguay, Venezuela, and Yemen), the nine countries
+with no available data for `isced_7_enrollment` (Algeria, Barbados,
+Belize, Fiji, Malawi, Uganda, Uruguay, Venezuela, and Yemen), and the
+three countries with no available data for `isced_8_enrollment` (i.e.,
+Algeria, Belize, and Jamaica).
+
+Among these 12 unique countries,
+
+``` r
+university_impact_model %>%
+  filter(country %in% "Algeria") %>%
+  filter(country=="Barbados") %>%
+  filter(country=="Benin") %>%
+  filter(country=="Fiji") %>%
+  filter(country=="Jamaica") %>%
+  filter(country=="Japan") %>%
+  filter(country=="Lebanon") %>%
+  filter(country=="Malawi") %>%
+  filter(country=="Uganda") %>%
+  filter(country=="Uruguay") %>%
+  filter(country=="Venezuela (Bolivarian Republic of)") %>%
+  filter(country=="Yemen") 
+```
+
+    ## # A tibble: 0 × 62
+    ## # Rowwise: 
+    ## # … with 62 variables: country <chr>, national_population <dbl>,
+    ## #   national_population_ref_year <dbl>, school_aged_population <dbl>,
+    ## #   school_aged_population_ref_year <dbl>, per_capita_gni <dbl>,
+    ## #   per_capita_gni_ref_year <dbl>, isced_6_enrollment <dbl>,
+    ## #   isced_6_ref_year <dbl>, isced_7_enrollment <dbl>, isced_7_ref_year <dbl>,
+    ## #   isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
+    ## #   university_enrollment <dbl>, proportion_school_aged <dbl>, …
+
+DO SPOT CORRECTIONS HERE
+
+By matching the 120 land areas represented in the newly merged
+`university_impact_model` and the 258 land areas represented in
+`shapefile_data`.
 
 ``` r
 anti_join(university_impact_model,shapefile_data,by="country") %>% distinct(country) %>% arrange(country)
@@ -1357,6 +1463,8 @@ shapefile_data <- shapefile_data %>%
   mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)"))
 ```
 
+CHANGE 120 RELEVANT COUNTRY NAMES TO ISO 3166 COUNTERPART HERE
+
 With this complete, we can finally proceed with our spatial join:
 
 ``` r
@@ -1368,7 +1476,8 @@ global_university_impact_model <- left_join(shapefile_data,university_impact_mod
 For our last step, we will export these final data files as CSVs in our
 repository using the following:
 
-STILL NEED TO PATCH IN INDICATOR-SPECIFIC VALUES
+STILL NEED TO PATCH IN INDICATOR-SPECIFIC VALUES \_ SHOULD ALSO ADD
+POPULATION IMPACT VARIABLES
 
 ``` r
 write.csv(university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model.csv")
