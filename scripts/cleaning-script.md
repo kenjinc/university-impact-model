@@ -1374,3 +1374,15 @@ STILL NEED TO PATCH IN INDICATOR-SPECIFIC VALUES
 write.csv(university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model.csv")
 write.csv(global_university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
 ```
+
+In addition to these two data files—which differ only in whether or not
+they contain the shape-file information, with
+`university-impact-model.csv` omitting it for ease of downstream
+analysis and `university-impact-model-shapefile.csv` containing it for
+data-visualization purposes—we also will generate a supplementary data
+file detailing the list of countries included.
+
+``` r
+country_list <- university_impact_model %>% distinct(country) %>% arrange(country)
+write.csv(country_list,"~/github/university-impact-model/data/model-output/country-list.csv")
+```
