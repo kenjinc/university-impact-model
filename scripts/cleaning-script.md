@@ -1159,14 +1159,13 @@ university_enrollment_data <- university_enrollment_data %>%
 
 With this complete, the country lists across both
 `university_enrollment_data` and `dietary_footprint_data` should now be
-the same, both in terms of the land areas they represent and the way in
-which those land areas are indexed and named.
+the same, both in terms of the land areas they represent and include,
+and the way in which those land areas are indexed and named.
 
-There are a few last things we still have to address, namely the
-instances where there are either presumed or definite missing data for
-individual indicators within `university_enrollment_data`, as
-highlighted below. For now, however, we can continue with our spatial
-join.
+There are a few final things we still need to address, namely the
+instances where there are either presumed or confirmed instances of
+missing data for individual indicators within
+`university_enrollment_data`, as highlighted below.
 
 ``` r
 university_enrollment_data %>%
@@ -1260,82 +1259,118 @@ university_enrollment_data %>%
     ## 2 Belize 
     ## 3 Jamaica
 
-Before joining these two cleaned data sources with our shape-file data,
-we can begin by merging them both together, given that they match
-according to the country column.
+However, for now, we can continue by joining these two data objects now
+that we have harmonized them across their corresponding `country`
+vectors.
 
 ``` r
-complete_model_data <- left_join(university_enrollment_data,impact_model_data,by="country")
-complete_model_data
+university_impact_model <- left_join(university_enrollment_data,impact_model_data,by="country")
 ```
 
-    ## # A tibble: 120 × 27
+As we can see, apart from some of the indicator-level omissions
+specified above, we have mostly complete data for the following 120
+countries:
+
+``` r
+university_impact_model %>% distinct(country)
+```
+
+    ## # A tibble: 120 × 1
     ## # Rowwise: 
-    ##    country     nationa…¹ natio…² schoo…³ schoo…⁴ per_c…⁵ per_c…⁶ isced…⁷ isced…⁸
-    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-    ##  1 Afghanistan  38042000    2019 3826080    2018     550    2018  3.66e5    2018
-    ##  2 Albania       2867000    2019  232597    2019    4860    2018  8.92e4    2019
-    ##  3 Algeria      43053000    2019 3116237    2018    3920    2017  9.96e5    2018
-    ##  4 Argentina    44901000    2019 3491568    2017   12390    2018  2.21e6    2017
-    ##  5 Armenia       2958000    2019  178853    2019    4230    2018  6.96e4    2019
-    ##  6 Australia    25303000    2019 1555767    2018   53230    2018  9.99e5    2018
-    ##  7 Austria       8865000    2019  496255    2018   49310    2018  1.99e5    2018
-    ##  8 Azerbaijan   10032000    2019  692066    2019    4050    2018  1.61e5    2019
-    ##  9 Barbados       287000    2019   18979    2015   15410    2018  0            0
-    ## 10 Belarus       9467000    2019  445306    2018    5670    2018  2.84e5    2018
-    ## # … with 110 more rows, 18 more variables: isced_7_enrollment <dbl>,
-    ## #   isced_7_ref_year <dbl>, isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
-    ## #   university_enrollment <dbl>, proportion_school_aged <dbl>,
-    ## #   proportion_school_aged_enrolled <dbl>, baseline_per_capita_kg_co2e <dbl>,
-    ## #   baseline_adjusted_per_capita_kg_co2e <dbl>,
-    ## #   baseline_oecd_per_capita_kg_co2e <dbl>,
-    ## #   meatless_day_per_capita_kg_co2e <dbl>, …
+    ##    country    
+    ##    <chr>      
+    ##  1 Afghanistan
+    ##  2 Albania    
+    ##  3 Algeria    
+    ##  4 Argentina  
+    ##  5 Armenia    
+    ##  6 Australia  
+    ##  7 Austria    
+    ##  8 Azerbaijan 
+    ##  9 Barbados   
+    ## 10 Belarus    
+    ## # … with 110 more rows
 
-From here, we follow a similar process, whereby we must match indexing
-conventions across the merged `complete_model_data` and the awaiting
-`shapefile_data`.
+Before patching in these specific data points using the same systematic
+process outlined for the case of Taiwan, we can proceed by matching the
+120 land areas represented in the newly merged `university_impact_model`
+and the 258 land areas represented in `shapefile_data`.
 
 ``` r
-anti_join(shapefile_data,complete_model_data,by="country") %>% select(country) %>% distinct(country)
+anti_join(university_impact_model,shapefile_data,by="country") %>% distinct(country) %>% arrange(country)
 ```
 
-    ## # A tibble: 155 × 1
-    ##    country            
-    ##    <chr>              
-    ##  1 American Samoa     
-    ##  2 Andorra            
-    ##  3 Angola             
-    ##  4 Anguilla           
-    ##  5 Antarctica         
-    ##  6 Antigua            
-    ##  7 Antigua and Barbuda
-    ##  8 Aruba              
-    ##  9 Ascension Island   
-    ## 10 Azores             
-    ## # … with 145 more rows
+    ## # A tibble: 17 × 1
+    ## # Rowwise: 
+    ##    country                           
+    ##    <chr>                             
+    ##  1 CÃ´te d'Ivoire                    
+    ##  2 Cabo Verde                        
+    ##  3 China, Hong Kong SAR              
+    ##  4 China, Macao SAR                  
+    ##  5 China, mainland                   
+    ##  6 China, Taiwan Province of         
+    ##  7 Congo                             
+    ##  8 Czechia                           
+    ##  9 Iran (Islamic Republic of)        
+    ## 10 Kyrgyzstan                        
+    ## 11 Republic of Korea                 
+    ## 12 Republic of Moldova               
+    ## 13 Russian Federation                
+    ## 14 Slovakia                          
+    ## 15 United Republic of Tanzania       
+    ## 16 United States of America          
+    ## 17 Venezuela (Bolivarian Republic of)
+
+By identifying the 17 countries that appear in `university_impact_model`
+without a one-to-one match in `shapefile_data`, we can see that all of
+these mismatches are a product of inconsistent naming. Said differently,
+all land areas found in `university_impact_model` are represented
+spatially within `shapefile_data`, just using different conventions.
+
+We correct this in two steps using the following:
 
 ``` r
-impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
-dietary_footprint_data %>% head(6)
+university_impact_model <- university_impact_model %>%
+  mutate(across(country,str_replace,"China, mainland","China")) %>%
+  mutate(across(country,str_replace,"China, Hong Kong SAR","Hong Kong")) %>%
+  mutate(across(country,str_replace,"China, Macao SAR","Macao")) %>%
+  mutate(across(country,str_replace,"China, Taiwan Province of","Taiwan"))
 ```
 
-    ## # A tibble: 6 × 85
-    ##   country        centi…¹ value…² centi…³ centi…⁴ value…⁵ centi…⁶ centi…⁷ value…⁸
-    ##   <chr>            <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
-    ## 1 Armenia          137.    1604.   289.    137.    1646.   289.   3107.   1.44e6
-    ## 2 Afghanistan       50.3    895.    60.6    50.3    898.    60.6    97.7  1.02e6
-    ## 3 Albania          125.    1952.   213.    125.    2013.   213.   1003.   1.44e6
-    ## 4 Algeria           98.6    983.   193.     98.6   1108.   193.    356.   1.30e6
-    ## 5 Antigua and B…   121.    1310.   204.    121.    1400.   204.   2791.   1.19e6
-    ## 6 Argentina         87.9   2952.   142.     87.9   3517.   142.    350.   1.02e6
-    ## # … with 76 more variables: centile_up_baseline_l_blue_green_wf <dbl>,
-    ## #   centile_down_baseline_l_blue_wf_total <dbl>,
-    ## #   value_baseline_l_blue_wf_total <dbl>,
-    ## #   centile_up_baseline_l_blue_wf_total <dbl>,
-    ## #   centile_down_meatless_day_kg_co2e_excl_luc <dbl>,
-    ## #   value_meatless_day_kg_co2e_excl_luc <dbl>,
-    ## #   centile_up_meatless_day_kg_co2e_excl_luc <dbl>, …
+``` r
+shapefile_data <- shapefile_data %>%
+  mutate(across(country,str_replace,"Cote d'Ivoire","CÃ´te d'Ivoire")) %>%
+  mutate(across(country,str_replace,"Cape Verde","Cabo Verde")) %>%
+  mutate(across(country,str_replace,"Hong Kong, China","Hong Kong")) %>%
+  mutate(across(country,str_replace,"Macao, China","Macao")) %>%
+  mutate(across(country,str_replace,"Congo, Rep.","Congo")) %>%
+  mutate(across(country,str_replace,"Czech Republic","Czechia")) %>%
+  mutate(across(country,str_replace,"Iran","Iran (Islamic Republic of)")) %>%
+  mutate(across(country,str_replace,"Krygyz Republic","Kyrgyzstan")) %>%
+  mutate(across(country,str_replace,"South Korea","Republic of Korea")) %>%
+  mutate(across(country,str_replace,"Moldova","Republic of Moldova")) %>%
+  mutate(across(country,str_replace,"Russia","Russian Federation")) %>%
+  mutate(across(country,str_replace,"Slovak Republic","Slovakia")) %>%
+  mutate(across(country,str_replace,"Tanzania","United Republic of Tanzania")) %>%
+  mutate(across(country,str_replace,"United States","United States of America")) %>%
+  mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)"))
+```
+
+With this complete, we can finally proceed with our spatial join:
 
 ``` r
-write.csv(impact_data,"~/github/university-impact-model/data/model-output/impact-data.csv")
+global_university_impact_model <- left_join(shapefile_data,university_impact_model,by="country")
+```
+
+## Writing the Final Data Files
+
+For our last step, we will export these final data files as CSVs in our
+repository using the following:
+
+STILL NEED TO PATCH IN INDICATOR-SPECIFIC VALUES
+
+``` r
+write.csv(university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model.csv")
+write.csv(global_university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
 ```

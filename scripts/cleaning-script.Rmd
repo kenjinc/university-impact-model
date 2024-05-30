@@ -625,9 +625,9 @@ university_enrollment_data <- university_enrollment_data %>%
 ```
 
 
-With this complete, the country lists across both `university_enrollment_data` and `dietary_footprint_data` should now be the same, both in terms of the land areas they represent and the way in which those land areas are indexed and named. 
+With this complete, the country lists across both `university_enrollment_data` and `dietary_footprint_data` should now be the same, both in terms of the land areas they represent and include, and the way in which those land areas are indexed and named. 
 
-There are a few last things we still have to address, namely the instances where there are either presumed or definite missing data for individual indicators within `university_enrollment_data`, as highlighted below. For now, however, we can continue with our spatial join. 
+There are a few final things we still need to address, namely the instances where there are either presumed or confirmed instances of missing data for individual indicators within `university_enrollment_data`, as highlighted below.
 
 ```{r}
 university_enrollment_data %>%
@@ -635,7 +635,6 @@ university_enrollment_data %>%
   filter(national_population==0) %>%
   distinct(country)
 ```
-
 
 ```{r}
 university_enrollment_data %>%
@@ -657,7 +656,6 @@ university_enrollment_data %>%
   distinct(country)
 ```
 
-
 ```{r}
 university_enrollment_data %>%
   rowwise() %>%
@@ -672,28 +670,68 @@ university_enrollment_data %>%
   distinct(country)
 ```
 
- Before joining these two cleaned data sources with our shape-file data, we can begin by merging them both together, given that they match according to the country column. 
+However, for now, we can continue by joining these two data objects now that we have harmonized them across their corresponding `country` vectors.
  
 ```{r}
-complete_model_data <- left_join(university_enrollment_data,impact_model_data,by="country")
-complete_model_data
+university_impact_model <- left_join(university_enrollment_data,impact_model_data,by="country")
 ```
 
-From here, we follow a similar process, whereby we must match indexing conventions across the merged `complete_model_data` and the awaiting `shapefile_data`.
+As we can see, apart from some of the indicator-level omissions specified above, we have mostly complete data for the following 120 countries:
 
 ```{r}
-anti_join(shapefile_data,complete_model_data,by="country") %>% select(country) %>% distinct(country)
+university_impact_model %>% distinct(country)
 ```
 
-
+Before patching in these specific data points using the same systematic process outlined for the case of Taiwan, we can proceed by matching the 120 land areas represented in the newly merged `university_impact_model` and the 258 land areas represented in `shapefile_data`. 
 
 ```{r}
-impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/parent-files/dietary_footprints_by_country.csv")
-dietary_footprint_data %>% head(6)
+anti_join(university_impact_model,shapefile_data,by="country") %>% distinct(country) %>% arrange(country)
 ```
 
+By identifying the 17 countries that appear in `university_impact_model` without a one-to-one match in `shapefile_data`, we can see that all of these mismatches are a product of inconsistent naming. Said differently, all land areas found in `university_impact_model` are represented spatially within `shapefile_data`, just using different conventions.
+
+We correct this in two steps using the following:
 
 ```{r}
-write.csv(impact_data,"~/github/university-impact-model/data/model-output/impact-data.csv")
+university_impact_model <- university_impact_model %>%
+  mutate(across(country,str_replace,"China, mainland","China")) %>%
+  mutate(across(country,str_replace,"China, Hong Kong SAR","Hong Kong")) %>%
+  mutate(across(country,str_replace,"China, Macao SAR","Macao")) %>%
+  mutate(across(country,str_replace,"China, Taiwan Province of","Taiwan"))
 ```
 
+```{r}
+shapefile_data <- shapefile_data %>%
+  mutate(across(country,str_replace,"Cote d'Ivoire","CÃ´te d'Ivoire")) %>%
+  mutate(across(country,str_replace,"Cape Verde","Cabo Verde")) %>%
+  mutate(across(country,str_replace,"Hong Kong, China","Hong Kong")) %>%
+  mutate(across(country,str_replace,"Macao, China","Macao")) %>%
+  mutate(across(country,str_replace,"Congo, Rep.","Congo")) %>%
+  mutate(across(country,str_replace,"Czech Republic","Czechia")) %>%
+  mutate(across(country,str_replace,"Iran","Iran (Islamic Republic of)")) %>%
+  mutate(across(country,str_replace,"Krygyz Republic","Kyrgyzstan")) %>%
+  mutate(across(country,str_replace,"South Korea","Republic of Korea")) %>%
+  mutate(across(country,str_replace,"Moldova","Republic of Moldova")) %>%
+  mutate(across(country,str_replace,"Russia","Russian Federation")) %>%
+  mutate(across(country,str_replace,"Slovak Republic","Slovakia")) %>%
+  mutate(across(country,str_replace,"Tanzania","United Republic of Tanzania")) %>%
+  mutate(across(country,str_replace,"United States","United States of America")) %>%
+  mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)"))
+```
+
+With this complete, we can finally proceed with our spatial join:
+
+```{r}
+global_university_impact_model <- left_join(shapefile_data,university_impact_model,by="country")
+```
+
+## Writing the Final Data Files
+
+For our last step, we will export these final data files as CSVs in our repository using the following: 
+
+STILL NEED TO PATCH IN INDICATOR-SPECIFIC VALUES
+
+```{r}
+write.csv(university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model.csv")
+write.csv(global_university_impact_model,"~/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
+```
