@@ -1,0 +1,12 @@
+---
+title: "Data Analysis and Visualization"
+output: github_document
+date: "Last updated: May 31, 2024"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
