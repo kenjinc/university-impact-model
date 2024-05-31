@@ -1268,28 +1268,7 @@ university_impact_model <- left_join(university_enrollment_data,impact_model_dat
 ```
 
 As we can see, apart from some of the indicator-level omissions
-specified above, we have mostly complete data for the following 120
-countries:
-
-``` r
-university_impact_model %>% distinct(country)
-```
-
-    ## # A tibble: 120 × 1
-    ## # Rowwise: 
-    ##    country    
-    ##    <chr>      
-    ##  1 Afghanistan
-    ##  2 Albania    
-    ##  3 Algeria    
-    ##  4 Argentina  
-    ##  5 Armenia    
-    ##  6 Australia  
-    ##  7 Austria    
-    ##  8 Azerbaijan 
-    ##  9 Barbados   
-    ## 10 Belarus    
-    ## # … with 110 more rows
+specified above, we have mostly complete data for the 120 countries.
 
 Before making systematized decisions about whether to patch in these
 specific data points for countries with missing data, as we did for
@@ -1368,37 +1347,195 @@ Belize, Fiji, Malawi, Uganda, Uruguay, Venezuela, and Yemen), and the
 three countries with no available data for `isced_8_enrollment` (i.e.,
 Algeria, Belize, and Jamaica).
 
-Among these 12 unique countries,
+These 22 instances of missing data correspond to 13 unique countries:
+Algeria (i.e., `isced_7_enrollment` and `isced_8_enrollment`, Barbados
+(i.e., `isced_6_enrollment` and `isced_7_enrollment`), Belize (i.e.,
+`isced_7_enrollment` and `isced_8_enrollment`), Benin (i.e.,
+`isced_6_enrollment`), Fiji (i.e., `isced_6_enrollment` and
+`isced_7_enrollment`), Jamaica (i.e., `isced_8_enrollment`), Japan
+(`school_aged_population`), Lebanon (`school_aged_population`), Malawi
+(i.e., `isced_6_enrollment` and `isced_7_enrollment`), Uganda (i.e.,
+`isced_6_enrollment` and `isced_7_enrollment`), Uruguay (i.e.,
+`isced_6_enrollment` and `isced_7_enrollment`), Venezuela (i.e.,
+`isced_6_enrollment` and `isced_7_enrollment`), and Yemen
+(`isced_6_enrollment` and `isced_7_enrollment`).
 
 ``` r
 university_impact_model %>%
-  filter(country %in% "Algeria") %>%
-  filter(country=="Barbados") %>%
-  filter(country=="Benin") %>%
-  filter(country=="Fiji") %>%
-  filter(country=="Jamaica") %>%
-  filter(country=="Japan") %>%
-  filter(country=="Lebanon") %>%
-  filter(country=="Malawi") %>%
-  filter(country=="Uganda") %>%
-  filter(country=="Uruguay") %>%
-  filter(country=="Venezuela (Bolivarian Republic of)") %>%
-  filter(country=="Yemen") 
+  filter(country=="Algeria"|country=="Barbados"|country=="Belize"|country=="Benin"|country=="Fiji"|country=="Jamaica"|country=="Japan"|country=="Lebanon"|country=="Malawi"|country=="Uganda"|country=="Uruguay"|country=="Venezuela (Bolivarian Republic of)"|country=="Yemen")
 ```
 
-    ## # A tibble: 0 × 62
+    ## # A tibble: 13 × 62
     ## # Rowwise: 
-    ## # … with 62 variables: country <chr>, national_population <dbl>,
-    ## #   national_population_ref_year <dbl>, school_aged_population <dbl>,
-    ## #   school_aged_population_ref_year <dbl>, per_capita_gni <dbl>,
-    ## #   per_capita_gni_ref_year <dbl>, isced_6_enrollment <dbl>,
-    ## #   isced_6_ref_year <dbl>, isced_7_enrollment <dbl>, isced_7_ref_year <dbl>,
+    ##    country       natio…¹ natio…² schoo…³ schoo…⁴ per_c…⁵ per_c…⁶ isced…⁷ isced…⁸
+    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Algeria        4.31e7    2019 3116237    2018    3920    2017  996087    2018
+    ##  2 Barbados       2.87e5    2019   18979    2015   15410    2018       0       0
+    ##  3 Belize         3.9 e5    2019   39334    2019    4470    2018    5383    2019
+    ##  4 Benin          1.18e7    2019 1057994    2018     870    2018       0       0
+    ##  5 Fiji           8.9 e5    2019   74034    2016    5860    2018       0       0
+    ##  6 Jamaica        2.95e6    2019  263211    2019    4970    2018   31487    2019
+    ##  7 Japan          1.26e8    2019       0       0   41310    2018 2674263    2018
+    ##  8 Lebanon        6.86e6    2019       0       0    7920    2018  191885    2019
+    ##  9 Malawi         1.86e7    2019 1594473    2014     360    2018       0       0
+    ## 10 Uganda         4.43e7    2019 3419644    2014     620    2018       0       0
+    ## 11 Uruguay        3.46e6    2019  257364    2017   15650    2018       0       0
+    ## 12 Venezuela (B…  2.85e7    2019 2660784    2015   13080    2014       0       0
+    ## 13 Yemen          2.92e7    2019 2877905    2014    1460    2014       0       0
+    ## # … with 53 more variables: isced_7_enrollment <dbl>, isced_7_ref_year <dbl>,
     ## #   isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
-    ## #   university_enrollment <dbl>, proportion_school_aged <dbl>, …
+    ## #   university_enrollment <dbl>, proportion_school_aged <dbl>,
+    ## #   proportion_school_aged_enrolled <dbl>, baseline_per_capita_kg_co2e <dbl>,
+    ## #   baseline_adjusted_per_capita_kg_co2e <dbl>,
+    ## #   baseline_oecd_per_capita_kg_co2e <dbl>,
+    ## #   meatless_day_per_capita_kg_co2e <dbl>, …
 
-DO SPOT CORRECTIONS HERE
+Using the same conventions as we did when populating demographic data
+for Taiwan, we will begin by trying to find single-year age data from
+official government bureaus or ministries to fill in data for Japan and
+Lebanon’s school-age-population, which UNESCO defines as ages 18-23 for
+tertiary education.
 
-By matching the 120 land areas represented in the newly merged
+In the case of Japan, we were able to extract this information from the
+[2020 Population
+Census](https://www.stat.go.jp/english/data/kokusei/index.html) reported
+by the [Statistics Bureau of
+Japan](https://www.stat.go.jp/english/index.html).
+
+More specifically, after selecting the set of indicators available
+within the [Basic Complete Tabulation on Population and
+Households](https://www.stat.go.jp/english/data/kokusei/2020/summary.html),
+we referenced [Table
+2-1](https://www.e-stat.go.jp/en/stat-search/files?page=1&layout=datalist&toukei=00200521&tstat=000001136464&cycle=0&year=20200&month=24101210&tclass1=000001136466),
+which can also be downloaded as a spreadsheet
+[here](https://www.e-stat.go.jp/en/stat-search/file-download?statInfId=000032142404&fileKind=0),
+to retrieve the single-year age populations for the whole country at age
+18 (`1151389`), 19 (`1159285`), 20 (`1177049`), 21 (`1174456`), 22
+(`1193935`), and 23 (`1193983`). These values yield a total school-aged
+population of `7050097` for reference year 2020, as single-year age data
+was unavailable for the year 2019.
+
+However, given that the data representing this variable for the
+remaining countries reflect population estimates rather than complete
+population counts, we will instead use this as a reference for the
+[IDB](https://www.census.gov/data-tools/demo/idb/#/dashboard?COUNTRY_YEAR=2024&COUNTRY_YR_ANIM=2024)-provided
+single-year-age-group estimates.
+
+When looking at the age tables for Japan for the selected reference year
+of 2019, we see that the population aged 18 (`1185752`), 19 (`1184102`),
+20 (`1221306`), 21 (`1226508`), 22 (`1231375`), and 23 (`1245298`) sum
+to `7294341`.
+
+``` r
+university_impact_model <- university_impact_model %>%
+  mutate(school_aged_population=replace(school_aged_population,country=="Japan",7294341)) %>%
+  mutate(school_aged_population_ref_year=replace(school_aged_population_ref_year,country=="Japan",2019))
+```
+
+Using the same resource, we can see that for the selected reference year
+of 2019, the Lebanese population aged 18 (`89824`), 19 (`94964`), 20
+(`89747`), 21 (`88918`), 22 (`89575`), and 23 (`90416`) sum to a total
+of `543444`.
+
+``` r
+university_impact_model <- university_impact_model %>%
+  mutate(school_aged_population=replace(school_aged_population,country=="Lebanon",543444)) %>%
+  mutate(school_aged_population_ref_year=replace(school_aged_population_ref_year,country=="Lebanon",2019))
+```
+
+For reasons of consistency, we can also optionally elect to update the
+single-year-age-group estimates comprising the `school_aged_population`
+indicator for Taiwan using the values provided by the IDB. As a
+reminder, this data point was previously derived from the [National
+Development
+Council](https://pop-proj.ndc.gov.tw/main_en/Custom_Detail_Search.aspx?t=1&n=175&sms=0)
+of Taiwan, also for reference year 2019, with the `1753830` sum being
+composed of single-age populations of `256704`, `305581`, `282248`,
+`266558`, `321943`, and `320796` for aged 18, 19, 20, 21, 22, and 23,
+respectively.
+
+The IDB-provided values, on the other hand, only differ slightly as
+follows: 18 (`282626`), 19 (`296353`), 20 (`276860`), 21 (`296251`), 22
+(`323160`), and 23 (`324116`).
+
+Again, for consistency and parsimony reasons, we will choose to plug in
+this new sum of `1799366` for Taiwan.
+
+``` r
+university_impact_model <- university_impact_model %>%
+  mutate(school_aged_population=replace(school_aged_population,country=="Taiwan",1799366)) %>%
+  mutate(school_aged_population_ref_year=replace(school_aged_population_ref_year,country=="Taiwan",2019))
+```
+
+Now, of the originally identified 22 missing-data instances impacting
+the data integrity of 13 countries, we have resolved two instances to
+yield complete data for another two countries.
+
+Of the 20 remaining instances of missing data, which now impact the data
+integrity of 11 countries, all pertain to country-level enrollment
+estimates in ISCED 6, 7, and 8 programs.
+
+- Algeria (i.e., `isced_7_enrollment` and `isced_8_enrollment`)
+- Barbados (i.e., `isced_6_enrollment` and `isced_7_enrollment`)
+- Belize (i.e., `isced_7_enrollment` and `isced_8_enrollment`)
+- Benin (i.e., `isced_6_enrollment`)
+- Fiji (i.e., `isced_6_enrollment` and `isced_7_enrollment`)
+- Jamaica (i.e., `isced_8_enrollment`)
+- Malawi (i.e., `isced_6_enrollment` and `isced_7_enrollment`)
+- Uganda (i.e., `isced_6_enrollment` and `isced_7_enrollment`)
+- Uruguay (i.e., `isced_6_enrollment` and `isced_7_enrollment`)
+- Venezuela (i.e., `isced_6_enrollment` and `isced_7_enrollment`)
+- Yemen (`isced_6_enrollment` and `isced_7_enrollment`).
+
+As a reminder, we had originally programmed `university_enrollment_data`
+such that all cases where `isced_6_enrollment` + `isced_7_enrollment` +
+`isced_8_enrollment` = 0 were filtered out of the dataset.
+
+These remaining 11 countries, by contrast, represent any occasion where
+enrollment in any particular set of programs was equivalent to zero.
+
+``` r
+university_impact_model %>%
+  filter(country=="Algeria"|country=="Barbados"|country=="Belize"|country=="Benin"|country=="Fiji"|country=="Jamaica"|country=="Malawi"|country=="Uganda"|country=="Uruguay"|country=="Venezuela (Bolivarian Republic of)"|country=="Yemen") %>%
+  select(country,university_enrollment,isced_6_ref_year,isced_6_enrollment,isced_7_ref_year,isced_7_enrollment,isced_8_ref_year,isced_8_enrollment)
+```
+
+    ## # A tibble: 11 × 8
+    ## # Rowwise: 
+    ##    country               unive…¹ isced…² isced…³ isced…⁴ isced…⁵ isced…⁶ isced…⁷
+    ##    <chr>                   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Algeria                9.96e5    2018  996087       0       0       0     0  
+    ##  2 Barbados               1.33e2       0       0       0       0    2011   133  
+    ##  3 Belize                 5.38e3    2019    5383       0       0       0     0  
+    ##  4 Benin                  1.47e4       0       0    2018   12657    2018  2060  
+    ##  5 Fiji                   1.62e2       0       0       0       0    2005   162  
+    ##  6 Jamaica                3.44e4    2019   31487    2018    2894       0     0  
+    ##  7 Malawi                 1.54e2       0       0       0       0    2010   154  
+    ##  8 Uganda                 2.19e3       0       0       0       0    2004  2194  
+    ##  9 Uruguay                9.10e1       0       0       0       0    2006    91.0
+    ## 10 Venezuela (Bolivaria…  5.72e3       0       0       0       0    2008  5718  
+    ## 11 Yemen                  6.4 e1       0       0       0       0    2007    64  
+    ## # … with abbreviated variable names ¹​university_enrollment, ²​isced_6_ref_year,
+    ## #   ³​isced_6_enrollment, ⁴​isced_7_ref_year, ⁵​isced_7_enrollment,
+    ## #   ⁶​isced_8_ref_year, ⁷​isced_8_enrollment
+
+Based on this, we need to construct a systematized process to separate
+the possible assumptions: (1) that these data accurately represent null
+levels of ISCED-program enrollment at the country level, (2) that these
+data are incomplete and provide enrollment estimates for some programs
+and not others, or (3) that the enrollment totals across programs are
+accurate but are aggregated incorrectly within specific program types.
+
+To add another layer of complexity, it is also possible that the most
+appropriate assumption may vary across countries. Given this, we will
+take the most conservative approach and assume that these EdStats
+indicators precisely reflect enrollment estimates across these divisions
+of ISCED programs but will caution in the manuscript that, specifically
+for these 11 countries, that these figures may be underreporting total
+enrollment across national colleges and universities.
+
+Now, we move on to the final steps ahead of our spatila join by matching
+the 120 land areas represented in the newly merged and corrected
 `university_impact_model` and the 258 land areas represented in
 `shapefile_data`.
 
@@ -1463,13 +1600,13 @@ shapefile_data <- shapefile_data %>%
   mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)"))
 ```
 
-CHANGE 120 RELEVANT COUNTRY NAMES TO ISO 3166 COUNTERPART HERE
-
 With this complete, we can finally proceed with our spatial join:
 
 ``` r
 global_university_impact_model <- left_join(shapefile_data,university_impact_model,by="country")
 ```
+
+CAN CHANGE COUNTRY NAMES AND ADD ISO 3166 CODE HERE
 
 ## Writing the Final Data Files
 
