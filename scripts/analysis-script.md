@@ -44,11 +44,11 @@ spatial_impact_data <- read.csv("/Users/kenjinchang/github/university-impact-mod
 During thi
 
 ``` r
-inclusion_figure <- spatial_impact_data %>%
+spatial_impact_data %>%
   mutate(inclusion=ifelse(university_enrollment>0,country)) %>%
   ggplot(aes(x=long,y=lat,fill=inclusion,group=group)) + 
-  geom_polygon(color="white",size=0.125,alpha=0.75) +
-  scale_fill_discrete(h=c(260,260),na.value="gray80") +
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_discrete(h=c(260,260),na.value="white") +
   guides(fill="none") +
   xlab("") + 
   ylab("") +
@@ -60,9 +60,11 @@ inclusion_figure <- spatial_impact_data %>%
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ## ℹ Please use `linewidth` instead.
 
+![](analysis-script_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
 ``` r
-enrollment_figure <- ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
-  geom_polygon(color="white",size=0.125,alpha=0.66) + 
+ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.66) + 
   scale_fill_continuous_sequential(labels=function(x)x/1000000,name="Millions Enrolled",palette="Purple-Blue",na.value="white",breaks=c(0,6000000,12000000,18000000,24000000,30000000),alpha=0.66) +
   guides(fill=guide_colorbar(title.position="top",title.hjust=0.5)) +
   xlab("") + 
@@ -72,10 +74,32 @@ enrollment_figure <- ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
+![](analysis-script_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
+CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
+guides(fill=guide_colorbar(reverse=TRUE,title.position=“top”,title.hjust=0.5))
++
+
 ``` r
-baseline <- ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_reduction_kg_co2e
+ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_reduction_kg_co2e
 ,group=group)) + 
-  geom_polygon(color="white",size=0.125,alpha=0.66) + 
+  geom_polygon(color="black",size=0.125,alpha=0.66) + 
+  scale_fill_gradient(low="palegreen",high="palegreen4",na.value="white") +
+  guides(fill=guide_colorbar(reverse=TRUE,title.position="top",title.hjust=0.5)) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Diet-Attributable Greenhouse Gas Footprint at Baseline") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
+,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.66) + 
   scale_fill_viridis_c(alpha=0.66,name=bquote('Kilograms CO'[2]*'e'),option="F",trans="reverse",na.value="white",labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
   guides(fill=guide_colorbar(reverse=TRUE,title.position="top",title.hjust=0.5)) +
   xlab("") + 
@@ -85,15 +109,4 @@ baseline <- ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_populati
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-``` r
-eat_lancet <- ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
-,group=group)) + 
-  geom_polygon(color="white",size=0.125,alpha=0.66) + 
-  scale_fill_viridis_c(alpha=0.66,name=bquote('Kilograms CO'[2]*'e'),option="F",trans="reverse",na.value="white",labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
-  guides(fill=guide_colorbar(reverse=TRUE,title.position="top",title.hjust=0.5)) +
-  xlab("") + 
-  ylab("") +
-  labs(caption="") +
-  ggtitle("Diet-Attributable Greenhouse Gas Footprint at Baseline") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
-```
+![](analysis-script_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
