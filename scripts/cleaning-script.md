@@ -1600,6 +1600,50 @@ shapefile_data <- shapefile_data %>%
   mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)"))
 ```
 
+Adding lending and development groups
+
+LENDING GROUPS
+
+Lending-group boundaries were determine via
+[this](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups)
+2024 World Bank classification scheme, which defines low-income
+economies as those with per capita GNI estimates of less 1,135 USD or
+less, lower-middle-income economies as those between 1,136 and 4,465,
+upper-middle-income economies as those between 4,466 and 13,845, and
+high-income economies as those equivalent to or exceeding 13,846.
+
+``` r
+university_impact_model %>%
+  mutate(lending_group=case_when(per_capita_gni<=1135~"low",
+                                 per_capita_gni>=1136&per_capita_gni<=4465~"lower-middle",
+                                 per_capita_gni>=4466&per_capita_gni<=13845~"upper-middle",
+                                 per_capita_gni>=13846~"high")) 
+```
+
+    ## # A tibble: 120 × 63
+    ## # Rowwise: 
+    ##    country     nationa…¹ natio…² schoo…³ schoo…⁴ per_c…⁵ per_c…⁶ isced…⁷ isced…⁸
+    ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
+    ##  1 Afghanistan  38042000    2019 3826080    2018     550    2018  3.66e5    2018
+    ##  2 Albania       2867000    2019  232597    2019    4860    2018  8.92e4    2019
+    ##  3 Algeria      43053000    2019 3116237    2018    3920    2017  9.96e5    2018
+    ##  4 Argentina    44901000    2019 3491568    2017   12390    2018  2.21e6    2017
+    ##  5 Armenia       2958000    2019  178853    2019    4230    2018  6.96e4    2019
+    ##  6 Australia    25303000    2019 1555767    2018   53230    2018  9.99e5    2018
+    ##  7 Austria       8865000    2019  496255    2018   49310    2018  1.99e5    2018
+    ##  8 Azerbaijan   10032000    2019  692066    2019    4050    2018  1.61e5    2019
+    ##  9 Barbados       287000    2019   18979    2015   15410    2018  0            0
+    ## 10 Belarus       9467000    2019  445306    2018    5670    2018  2.84e5    2018
+    ## # … with 110 more rows, 54 more variables: isced_7_enrollment <dbl>,
+    ## #   isced_7_ref_year <dbl>, isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
+    ## #   university_enrollment <dbl>, proportion_school_aged <dbl>,
+    ## #   proportion_school_aged_enrolled <dbl>, baseline_per_capita_kg_co2e <dbl>,
+    ## #   baseline_adjusted_per_capita_kg_co2e <dbl>,
+    ## #   baseline_oecd_per_capita_kg_co2e <dbl>,
+    ## #   meatless_day_per_capita_kg_co2e <dbl>, …
+
+DEVELOPMENT GROUPS
+
 With this complete, we can finally proceed with our spatial join:
 
 ``` r

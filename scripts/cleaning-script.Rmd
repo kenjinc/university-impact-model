@@ -841,11 +841,30 @@ shapefile_data <- shapefile_data %>%
   mutate(across(country,str_replace,"Venezuela","Venezuela (Bolivarian Republic of)"))
 ```
 
+
+Adding lending and development groups
+
+LENDING GROUPS
+
+Lending-group boundaries were determine via [this](https://datahelpdesk.worldbank.org/knowledgebase/articles/906519-world-bank-country-and-lending-groups) 2024 World Bank classification scheme, which defines low-income economies as those with per capita GNI estimates of less 1,135 USD or less, lower-middle-income economies as those between 1,136 and 4,465, upper-middle-income economies as those between 4,466 and 13,845, and high-income economies as those equivalent to or exceeding 13,846.
+
+```{r}
+university_impact_model %>%
+  mutate(lending_group=case_when(per_capita_gni<=1135~"low",
+                                 per_capita_gni>=1136&per_capita_gni<=4465~"lower-middle",
+                                 per_capita_gni>=4466&per_capita_gni<=13845~"upper-middle",
+                                 per_capita_gni>=13846~"high")) 
+```
+
+DEVELOPMENT GROUPS
+
 With this complete, we can finally proceed with our spatial join:
 
 ```{r}
 global_university_impact_model <- left_join(shapefile_data,university_impact_model,by="country")
 ```
+
+
 
 
 
