@@ -1722,6 +1722,19 @@ university_impact_model <- university_impact_model %>%
 
 - Name Alignment
 
+Because the names have yet to be adjusted within our shape-file data, we
+will wait to do this step until after the join has been done.
+
+With these last few steps complete, we can now finally proceed with our
+spatial join:
+
+``` r
+global_university_impact_model <- left_join(shapefile_data,university_impact_model,by="country")
+```
+
+Now that the spatial join has been completed, we can align the matched
+nation-state names to the shortened ISO 3166 names.
+
 ``` r
 university_impact_model <- university_impact_model %>%
   mutate(across(country,str_replace,"Congo","Congo (the)")) %>%
@@ -1736,13 +1749,19 @@ university_impact_model <- university_impact_model %>%
   mutate(across(country,str_replace,"Turkey","Türkiye")) %>%
   mutate(across(country,str_replace,"United Kingdom","United Kingdom of Great Britain and Northern Ireland (the)")) %>%
   mutate(across(country,str_replace,"United States of America","United States of America (the)")) 
-```
-
-With these last few steps complete, we can now finally proceed with our
-spatial join:
-
-``` r
-global_university_impact_model <- left_join(shapefile_data,university_impact_model,by="country")
+global_university_impact_model <- global_university_impact_model %>%
+  mutate(across(country,str_replace,"Congo","Congo (the)")) %>%
+  mutate(across(country,str_replace,"CÃ´te d'Ivoire","Côte d'Ivoire")) %>%
+  mutate(across(country,str_replace,"Republic of Korea","Korea (the Republic of)")) %>%
+  mutate(across(country,str_replace,"Republic of Moldova","Moldova (the Republic of)")) %>%
+  mutate(across(country,str_replace,"Netherlands","Netherlands (Kingdom of the)")) %>%
+  mutate(across(country,str_replace,"Niger","Niger (the)")) %>%
+  mutate(across(country,str_replace,"Philippines","Philippines (the)")) %>%
+  mutate(across(country,str_replace,"Russian Federation","Russidan Federation (the)")) %>%
+  mutate(across(country,str_replace,"United Republic of Tanzania","Tanzania (the United Republic of)")) %>%
+  mutate(across(country,str_replace,"Turkey","Türkiye")) %>%
+  mutate(across(country,str_replace,"United Kingdom","United Kingdom of Great Britain and Northern Ireland (the)")) %>%
+  mutate(across(country,str_replace,"United States of America","United States of America (the)")) 
 ```
 
 ## Writing the Final Data Files
