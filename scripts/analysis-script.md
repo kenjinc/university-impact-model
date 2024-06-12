@@ -33,15 +33,10 @@ library(ggpubr)
 
 ``` r
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model.csv")
-```
-
-``` r
 spatial_impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
 ```
 
-## Included Countries
-
-During thi
+## Nation-State Inclusion Figure
 
 ``` r
 spatial_impact_data %>%
@@ -53,14 +48,70 @@ spatial_impact_data %>%
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 countries included in our analyses.") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
   theme(legend.position="none",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
 ```
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ## ℹ Please use `linewidth` instead.
 
+![](analysis-script_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+
+``` r
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=lending_group,group=group)) + 
+  geom_polygon(color="black",size=0.125) +
+  scale_fill_brewer(palette="Set2",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
 ![](analysis-script_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+``` r
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=lending_group_dichotomy,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_brewer(palette="Set2",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+``` r
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=development_group,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_brewer(palette="Set3",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+
+``` r
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=development_group_dichotomy,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_brewer(palette="Set3",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
@@ -74,7 +125,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -94,7 +145,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -109,4 +160,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->

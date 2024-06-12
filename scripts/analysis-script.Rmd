@@ -22,16 +22,11 @@ library(ggpubr)
 
 ```{r}
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model.csv")
-```
-
-```{r}
 spatial_impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
 ```
 
 
-## Included Countries
-
-During thi
+## Nation-State Inclusion Figure
 
 ```{r}
 spatial_impact_data %>%
@@ -43,8 +38,59 @@ spatial_impact_data %>%
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 countries included in our analyses.") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
   theme(legend.position="none",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+
+
+```{r}
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=lending_group,group=group)) + 
+  geom_polygon(color="black",size=0.125) +
+  scale_fill_brewer(palette="Set2",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+```{r}
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=lending_group_dichotomy,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_brewer(palette="Set2",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+
+```{r}
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=development_group,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_brewer(palette="Set3",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+```
+
+```{r}
+spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=development_group_dichotomy,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.75) +
+  scale_fill_brewer(palette="Set3",na.value="white") +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
 ```
 
 
