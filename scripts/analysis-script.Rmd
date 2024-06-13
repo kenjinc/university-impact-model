@@ -16,6 +16,7 @@ library(viridis)
 library(RColorBrewer)
 library(colorspace)
 library(ggpubr)
+library(ggridges)
 ```
 
 ## Data Loading
@@ -26,7 +27,7 @@ spatial_impact_data <- read.csv("/Users/kenjinchang/github/university-impact-mod
 ```
 
 
-## Nation-State Inclusion Figure
+## Nation-State Inclusion 
 
 ```{r}
 spatial_impact_data %>%
@@ -38,60 +39,173 @@ spatial_impact_data %>%
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="none",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  ggtitle("Figure X. Choropleth map indicating the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-
+## Lending- and Development-Group Membership
 
 ```{r}
-spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=lending_group,group=group)) + 
+impact_data %>%
+  count(lending_group)
+```
+
+```{r}
+lending_group_membership <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
   geom_polygon(color="black",size=0.125) +
-  scale_fill_brewer(palette="Set2",na.value="white") +
+  scale_fill_brewer(palette="Set2",na.value="white",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+impact_data %>%
+  count(development_group)
+```
+
+```{r}
+development_group_membership <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
+  geom_polygon(color="black",size=0.125) +
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+
+  ggtitle("Figure X. Choropleth map sorting the 120 nation-states included in our analyses into their corresponding lending- and development-group categories.") +
+  
+```{r}
+ggarrange(lending_group_membership,development_group_membership,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+## Lending- and Development-Group Distributions
+
+```{r}
+lending_group_distribution <- impact_data %>%
+  ggplot(aes(baseline_population_kg_co2e,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")),color=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set2",name="Lending Group") +
+  scale_fill_brewer(palette="Set2",name="Lending Group") + 
+  xlim(-1000000000,2500000000) + 
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+development_group_distribution <- impact_data %>%
+  ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")),color=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set3",name="Development Group") +
+  scale_fill_brewer(palette="Set3",name="Development Group") + 
+  xlim(-390000000,1500000000) +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+ggarrange(lending_group_distribution,development_group_distribution,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+## Lending- and Development-Group Membership, Dichotomized
+
+```{r}
+impact_data %>%
+  count(lending_group_dichotomy)
 ```
 
 ```{r}
 spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=lending_group_dichotomy,group=group)) + 
-  geom_polygon(color="black",size=0.125,alpha=0.75) +
-  scale_fill_brewer(palette="Set2",na.value="white") +
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(lending_group_dichotomy,levels=c("Lower","Higher","NA")))) + 
+  geom_polygon(color="black",size=0.125) +
+  scale_fill_brewer(palette="Set2",na.value="white",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
   ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-
 ```{r}
-spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=development_group,group=group)) + 
-  geom_polygon(color="black",size=0.125,alpha=0.75) +
-  scale_fill_brewer(palette="Set3",na.value="white") +
-  xlab("") + 
-  ylab("") +
-  labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+impact_data %>%
+  count(development_group_dichotomy)
 ```
 
 ```{r}
 spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=development_group_dichotomy,group=group)) + 
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(development_group_dichotomy,levels=c("Global South","Global North","NA")))) + 
   geom_polygon(color="black",size=0.125,alpha=0.75) +
-  scale_fill_brewer(palette="Set3",na.value="white") +
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
   ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
+
+## Groupwise Comparison
+
+```{r}
+impact_data %>%
+  group_by(lending_group) %>%
+  summarize(mean=mean(baseline_population_kg_co2e),sd=sd(baseline_population_kg_co2e)) 
+```
+
+
+```{r}
+impact_data %>%
+  group_by(development_group) %>%
+  summarize(mean=mean(baseline_population_kg_co2e),sd=sd(baseline_population_kg_co2e)) 
+```
+
+
+```{r}
+impact_data %>%
+  ggplot(aes(factor(lending_group),baseline_population_kg_co2e)) + 
+  geom_violin(scale="width") + 
+  stat_summary(fun.y=mean, geom="point", shape=21, size=2) +
+  coord_flip()
+```
+
+
+```{r}
+impact_data %>%
+  ggplot(aes(factor(development_group),baseline_population_kg_co2e)) + 
+  geom_violin(scale="width") + 
+  stat_summary(fun.y=mean, geom="point", shape=21, size=2) +
+  coord_flip()
+```
+
+```{r}
+impact_data %>% 
+ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
+  geom_density_ridges_gradient() +
+  scale_fill_viridis_c(option="C")
+```
+```{r}
+impact_data %>% 
+ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
+  geom_density_ridges_gradient() +
+  scale_fill_viridis_c(option="C")
+```
+
+
+### Average Reduction
+
+
+
+
+
+
+
+
 
 
 ```{r}

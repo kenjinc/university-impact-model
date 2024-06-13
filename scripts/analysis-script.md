@@ -27,6 +27,7 @@ library(viridis)
 library(RColorBrewer)
 library(colorspace)
 library(ggpubr)
+library(ggridges)
 ```
 
 ## Data Loading
@@ -36,7 +37,7 @@ impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/
 spatial_impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
 ```
 
-## Nation-State Inclusion Figure
+## Nation-State Inclusion
 
 ``` r
 spatial_impact_data %>%
@@ -48,8 +49,8 @@ spatial_impact_data %>%
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="none",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  ggtitle("Figure X. Choropleth map indicating the 120 nation-states included in our analyses.") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
@@ -57,61 +58,225 @@ spatial_impact_data %>%
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
 
+## Lending- and Development-Group Membership
+
 ``` r
-spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=lending_group,group=group)) + 
+impact_data %>%
+  count(lending_group)
+```
+
+    ##   lending_group  n
+    ## 1          High 46
+    ## 2           Low 13
+    ## 3  Lower-Middle 30
+    ## 4  Upper-Middle 31
+
+``` r
+lending_group_membership <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
   geom_polygon(color="black",size=0.125) +
-  scale_fill_brewer(palette="Set2",na.value="white") +
+  scale_fill_brewer(palette="Set2",na.value="white",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+``` r
+impact_data %>%
+  count(development_group)
+```
+
+    ##   development_group  n
+    ## 1              High 30
+    ## 2               Low 16
+    ## 3            Medium 16
+    ## 4         Very High 58
+
+``` r
+development_group_membership <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
+  geom_polygon(color="black",size=0.125) +
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+ggtitle(“Figure X. Choropleth map sorting the 120 nation-states included
+in our analyses into their corresponding lending- and development-group
+categories.”) +
+
+``` r
+ggarrange(lending_group_membership,development_group_membership,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+## Lending- and Development-Group Distributions
+
+``` r
+lending_group_distribution <- impact_data %>%
+  ggplot(aes(baseline_population_kg_co2e,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")),color=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set2",name="Lending Group") +
+  scale_fill_brewer(palette="Set2",name="Lending Group") + 
+  xlim(-1000000000,2500000000) + 
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+development_group_distribution <- impact_data %>%
+  ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")),color=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set3",name="Development Group") +
+  scale_fill_brewer(palette="Set3",name="Development Group") + 
+  xlim(-390000000,1500000000) +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+ggarrange(lending_group_distribution,development_group_distribution,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+    ## Warning: Removed 23 rows containing non-finite values (`stat_density()`).
+
+    ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+
+## Lending- and Development-Group Membership, Dichotomized
+
+``` r
+impact_data %>%
+  count(lending_group_dichotomy)
+```
+
+    ##   lending_group_dichotomy  n
+    ## 1                  Higher 77
+    ## 2                   Lower 43
 
 ``` r
 spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=lending_group_dichotomy,group=group)) + 
-  geom_polygon(color="black",size=0.125,alpha=0.75) +
-  scale_fill_brewer(palette="Set2",na.value="white") +
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(lending_group_dichotomy,levels=c("Lower","Higher","NA")))) + 
+  geom_polygon(color="black",size=0.125) +
+  scale_fill_brewer(palette="Set2",na.value="white",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
   ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+impact_data %>%
+  count(development_group_dichotomy)
+```
+
+    ##   development_group_dichotomy  n
+    ## 1                Global North 58
+    ## 2                Global South 62
 
 ``` r
 spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=development_group,group=group)) + 
+  ggplot(aes(x=long,y=lat,group=group,fill=factor(development_group_dichotomy,levels=c("Global South","Global North","NA")))) + 
   geom_polygon(color="black",size=0.125,alpha=0.75) +
-  scale_fill_brewer(palette="Set3",na.value="white") +
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
   ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+## Groupwise Comparison
 
 ``` r
-spatial_impact_data %>%
-  ggplot(aes(x=long,y=lat,fill=development_group_dichotomy,group=group)) + 
-  geom_polygon(color="black",size=0.125,alpha=0.75) +
-  scale_fill_brewer(palette="Set3",na.value="white") +
-  xlab("") + 
-  ylab("") +
-  labs(caption="") +
-  ggtitle("Figure X. Choropleth map highlighting the 120 nation-states included in our analyses.") +
-  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank())
+impact_data %>%
+  group_by(lending_group) %>%
+  summarize(mean=mean(baseline_population_kg_co2e),sd=sd(baseline_population_kg_co2e)) 
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+    ## # A tibble: 4 × 3
+    ##   lending_group        mean          sd
+    ##   <chr>               <dbl>       <dbl>
+    ## 1 High          1720526195. 3766983678.
+    ## 2 Low            148666615.  165328434.
+    ## 3 Lower-Middle  1646699500. 5061097874.
+    ## 4 Upper-Middle  3768163828. 8922599752.
+
+``` r
+impact_data %>%
+  group_by(development_group) %>%
+  summarize(mean=mean(baseline_population_kg_co2e),sd=sd(baseline_population_kg_co2e)) 
+```
+
+    ## # A tibble: 4 × 3
+    ##   development_group        mean          sd
+    ##   <chr>                   <dbl>       <dbl>
+    ## 1 High              3473393904. 8990717899.
+    ## 2 Low                264613360.  610595625.
+    ## 3 Medium            1952393522. 6859432419.
+    ## 4 Very High         1855465645. 3624531105.
+
+``` r
+impact_data %>%
+  ggplot(aes(factor(lending_group),baseline_population_kg_co2e)) + 
+  geom_violin(scale="width") + 
+  stat_summary(fun.y=mean, geom="point", shape=21, size=2) +
+  coord_flip()
+```
+
+    ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
+    ## ℹ Please use the `fun` argument instead.
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+impact_data %>%
+  ggplot(aes(factor(development_group),baseline_population_kg_co2e)) + 
+  geom_violin(scale="width") + 
+  stat_summary(fun.y=mean, geom="point", shape=21, size=2) +
+  coord_flip()
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+impact_data %>% 
+ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
+  geom_density_ridges_gradient() +
+  scale_fill_viridis_c(option="C")
+```
+
+    ## Warning: `stat(x)` was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `after_stat(x)` instead.
+
+    ## Picking joint bandwidth of 3.75e+08
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+``` r
+impact_data %>% 
+ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
+  geom_density_ridges_gradient() +
+  scale_fill_viridis_c(option="C")
+```
+
+    ## Picking joint bandwidth of 3.94e+08
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+### Average Reduction
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
@@ -125,7 +290,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -145,7 +310,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -160,4 +325,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
