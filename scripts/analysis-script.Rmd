@@ -18,6 +18,7 @@ library(colorspace)
 library(ggpubr)
 library(ggridges)
 library(forcats)
+library(lazyeval)
 ```
 
 ## Data Loading
@@ -89,14 +90,45 @@ ggarrange(lending_group_membership,development_group_membership,
 
 ## Lending- and Development-Group Distributions
 
+First, change population figures to millions kg Co2e
+
+
+```{r}
+impact_data <- impact_data %>%
+  mutate(baseline_population_kg_co2e=baseline_population_kg_co2e/1000000) %>%
+  mutate(baseline_adjusted_population_kg_co2e=baseline_adjusted_population_kg_co2e/1000000) %>%
+  mutate(baseline_oecd_population_kg_co2e=baseline_oecd_population_kg_co2e/1000000) %>%
+  mutate(meatless_day_population_kg_co2e=meatless_day_population_kg_co2e/1000000) %>%
+  mutate(low_red_meat_population_kg_co2e=low_red_meat_population_kg_co2e/1000000) %>%
+  mutate(no_red_meat_population_kg_co2e=no_red_meat_population_kg_co2e/1000000) %>%
+  mutate(no_dairy_population_kg_co2e=no_dairy_population_kg_co2e/1000000) %>%
+  mutate(pescetarian_population_kg_co2e=pescetarian_population_kg_co2e/1000000) %>%
+  mutate(lacto_ovo_vegetarian_population_kg_co2e=lacto_ovo_vegetarian_population_kg_co2e/1000000) %>%
+  mutate(eat_lancet_population_kg_co2e=eat_lancet_population_kg_co2e/1000000) %>%
+  mutate(two_thirds_vegan_population_kg_co2e=two_thirds_vegan_population_kg_co2e/1000000) %>%
+  mutate(vegan_population_kg_co2e=vegan_population_kg_co2e/1000000) %>%
+  mutate(baseline_adjusted_population_reduction_kg_co2e=baseline_adjusted_population_reduction_kg_co2e/1000000) %>%
+  mutate(baseline_oecd_population_reduction_kg_co2e=baseline_oecd_population_reduction_kg_co2e/1000000) %>%
+  mutate(meatless_day_population_reduction_kg_co2e=meatless_day_population_reduction_kg_co2e/1000000) %>%
+  mutate(low_red_meat_population_reduction_kg_co2e=low_red_meat_population_reduction_kg_co2e/1000000) %>%
+  mutate(no_red_meat_population_reduction_kg_co2e=no_red_meat_population_reduction_kg_co2e/1000000) %>%
+  mutate(no_dairy_population_reduction_kg_co2e=no_dairy_population_reduction_kg_co2e/1000000) %>%
+  mutate(pescetarian_population_reduction_kg_co2e=pescetarian_population_reduction_kg_co2e/1000000) %>%
+  mutate(lacto_ovo_vegetarian_population_reduction_kg_co2e=lacto_ovo_vegetarian_population_reduction_kg_co2e/1000000) %>%
+  mutate(eat_lancet_population_reduction_kg_co2e=eat_lancet_population_reduction_kg_co2e/1000000) %>%
+  mutate(two_thirds_vegan_population_reduction_kg_co2e=two_thirds_vegan_population_reduction_kg_co2e/1000000) %>%
+  mutate(vegan_population_reduction_kg_co2e=vegan_population_reduction_kg_co2e/1000000)
+```
+
+
 ```{r}
 lending_group_distribution <- impact_data %>%
   ggplot(aes(baseline_population_kg_co2e,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")),color=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) +
   scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
-  xlim(-800000000,2500000000) + 
-  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (kg CO'[2]*'e)')) +
+  xlim(-800,2500) + 
+  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (Million kg CO'[2]*'e)')) +
   ylab("Density") +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
@@ -107,8 +139,8 @@ development_group_distribution <- impact_data %>%
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
   scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) + 
-  xlim(-400000000,1500000000) +
-  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (kg CO'[2]*'e)')) +
+  xlim(-400,1500) +
+  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (Million kg CO'[2]*'e)')) +
   ylab("Density") +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
@@ -170,8 +202,8 @@ lending_group_distribution_dichotomized <- impact_data %>%
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set2",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) +
   scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) + 
-  xlim(-800000000,2500000000) + 
-  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (kg CO'[2]*'e)')) +
+  xlim(-800,2500) + 
+  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (Millions of kg CO'[2]*'e)')) +
   ylab("Density") +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
@@ -182,8 +214,8 @@ development_group_distribution_dichotomized <- impact_data %>%
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set3",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) +
   scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) + 
-  xlim(-400000000,1500000000) +
-  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (kg CO'[2]*'e)')) +
+  xlim(-400,1500) +
+  xlab(bquote('Annual Population-Level, Diet-Attributable Emissions at Baseline (Millions of kg CO'[2]*'e)')) +
   ylab("Density") +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
@@ -212,25 +244,40 @@ impact_data %>%
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
 ```
 
+
+should also find which scneario greatest reduction by country - should spot check this
+
 ```{r}
-impact_data 
+impact_data <- impact_data %>%
+  mutate(greatest_population_reduction_kg_co2e=pmax(meatless_day_population_reduction_kg_co2e,low_red_meat_population_reduction_kg_co2e,no_red_meat_population_reduction_kg_co2e,no_dairy_population_reduction_kg_co2e,pescetarian_population_reduction_kg_co2e,lacto_ovo_vegetarian_population_reduction_kg_co2e,eat_lancet_population_reduction_kg_co2e,two_thirds_vegan_population_reduction_kg_co2e,vegan_population_reduction_kg_co2e))
+```
+
+```{r}
+impact_data <- impact_data %>%
+  mutate(greatest_reduction_diet=case_when(greatest_population_reduction_kg_co2e==meatless_day_population_reduction_kg_co2e~"Meatless Day",
+                                           greatest_population_reduction_kg_co2e==low_red_meat_population_reduction_kg_co2e~"Low Red Meat",
+                                           greatest_population_reduction_kg_co2e==no_red_meat_population_reduction_kg_co2e~"No Red Meat",
+                                           greatest_population_reduction_kg_co2e==no_dairy_population_reduction_kg_co2e~"No Dairy",
+                                           greatest_population_reduction_kg_co2e==pescetarian_population_reduction_kg_co2e~"Pescetarian",
+                                           greatest_population_reduction_kg_co2e==lacto_ovo_vegetarian_population_reduction_kg_co2e~"Lacto-Ovo Vegetarian",
+                                           greatest_population_reduction_kg_co2e==eat_lancet_population_reduction_kg_co2e~"EAT Lancet",
+                                           greatest_population_reduction_kg_co2e==two_thirds_vegan_population_reduction_kg_co2e~"Two-Thirds Vegan",
+                                           greatest_population_reduction_kg_co2e==vegan_population_reduction_kg_co2e~"Vegan"))
 ```
 
 
-should also find which scneario greatest reduction by country - this isn't doing what it's supposed to.......
 
-```{r}
 impact_data %>%
-  mutate(optimal_pattern=case_when(meatless_day_population_reduction_kg_co2e<low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Meatless Day",
-                                   low_red_meat_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Low Red Meat",
-                                   no_red_meat_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"No Red Meat",
-                                   no_dairy_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"No Dairy",
-                                   pescetarian_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Pescetarian",
-                                   lacto_ovo_vegetarian_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Lacto-Ovo Vegetarian",
-                                   eat_lancet_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"EAT-Lancet",
-                                    two_thirds_vegan_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Two-Thirds Vegan",
-                                   vegan_population_reduction_kg_co2e<meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e~"Vegan"))
-```
+  mutate(optimal_pattern=case_when(meatless_day_population_reduction_kg_co2e>low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Meatless Day",
+                                   low_red_meat_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Low Red Meat",
+                                   no_red_meat_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"No Red Meat",
+                                   no_dairy_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"No Dairy",
+                                   pescetarian_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Pescetarian",
+                                   lacto_ovo_vegetarian_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Lacto-Ovo Vegetarian",
+                                   eat_lancet_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"EAT-Lancet",
+                                    two_thirds_vegan_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~"Two-Thirds Vegan",
+                                   vegan_population_reduction_kg_co2e>meatless_day_population_reduction_kg_co2e&low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e~"Vegan"))
+
 
 mutate(national_population=ifelse(yr2019_national_population>0,yr2019_national_population,ifelse(yr2018_national_population>0,yr2018_national_population,ifelse(yr2017_national_population>0,yr2017_national_population,ifelse(yr2016_national_population>0,yr2016_national_population,ifelse(yr2015_national_population>0,yr2015_national_population,ifelse(yr2014_national_population>0,yr2014_national_population,ifelse(yr2013_national_population>0,yr2013_national_population,ifelse(yr2012_national_population>0,yr2012_national_population,ifelse(yr2011_national_population>0,yr2011_national_population,ifelse(yr2010_national_population>0,yr2010_national_population,ifelse(yr2009_national_population>0,yr2009_national_population,ifelse(yr2008_national_population>0,yr2008_national_population,ifelse(yr2007_national_population>0,yr2007_national_population,ifelse(yr2006_national_population>0,yr2006_national_population,ifelse(yr2005_national_population>0,yr2005_national_population,ifelse(yr2004_national_population>0,yr2004_national_population,ifelse(yr2003_national_population>0,yr2003_national_population,ifelse(yr2002_national_population>0,yr2002_national_population,ifelse(yr2001_national_population>0,yr2001_national_population,ifelse(yr2000_national_population>0,yr2000_national_population,0))))))))))))))))))))) %>%
 
