@@ -265,6 +265,12 @@ impact_data <- impact_data %>%
                                            greatest_population_reduction_kg_co2e==vegan_population_reduction_kg_co2e~"Vegan"))
 ```
 
+```{r}
+impact_data %>%
+  summarize(sum(greatest_population_reduction_kg_co2e))
+```
+estimates the total global impact if the most ideal dietary change occurred 
+
 
 
 impact_data %>%

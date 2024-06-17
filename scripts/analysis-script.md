@@ -325,6 +325,17 @@ impact_data <- impact_data %>%
                                            greatest_population_reduction_kg_co2e==vegan_population_reduction_kg_co2e~"Vegan"))
 ```
 
+``` r
+impact_data %>%
+  summarize(sum(greatest_population_reduction_kg_co2e))
+```
+
+    ##   sum(greatest_population_reduction_kg_co2e)
+    ## 1                                     190528
+
+estimates the total global impact if the most ideal dietary change
+occurred
+
 impact_data %\>%
 mutate(optimal_pattern=case_when(meatless_day_population_reduction_kg_co2e\>low_red_meat_population_reduction_kg_co2e&no_red_meat_population_reduction_kg_co2e&no_dairy_population_reduction_kg_co2e&pescetarian_population_reduction_kg_co2e&lacto_ovo_vegetarian_population_reduction_kg_co2e&eat_lancet_population_reduction_kg_co2e&two_thirds_vegan_population_reduction_kg_co2e&vegan_population_reduction_kg_co2e~“Meatless
 Day”,
@@ -411,7 +422,7 @@ impact_data %>%
     ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
     ## ℹ Please use the `fun` argument instead.
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -421,7 +432,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -435,7 +446,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 375
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -446,7 +457,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 394
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -462,7 +473,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -482,7 +493,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -497,4 +508,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
