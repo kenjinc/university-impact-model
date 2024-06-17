@@ -706,7 +706,7 @@ university_impact_model <- university_impact_model%>%
   mutate(baseline_oecd_population_reduction_kg_co2e=baseline_population_kg_co2e-baseline_oecd_population_kg_co2e) %>%
   mutate(meatless_day_population_reduction_kg_co2e=baseline_population_kg_co2e-meatless_day_population_kg_co2e) %>%
   mutate(low_red_meat_population_reduction_kg_co2e=baseline_population_kg_co2e-low_red_meat_population_kg_co2e) %>%
-  mutate(no_red_meat_day_population_reduction_kg_co2e=baseline_population_kg_co2e-no_red_meat_population_kg_co2e) %>%
+  mutate(no_red_meat_population_reduction_kg_co2e=baseline_population_kg_co2e-no_red_meat_population_kg_co2e) %>%
   mutate(no_dairy_population_reduction_kg_co2e=baseline_population_kg_co2e-no_dairy_population_kg_co2e) %>%
   mutate(pescetarian_population_reduction_kg_co2e=baseline_population_kg_co2e-pescetarian_population_kg_co2e) %>%
   mutate(lacto_ovo_vegetarian_population_reduction_kg_co2e=baseline_population_kg_co2e-lacto_ovo_vegetarian_population_kg_co2e) %>%
