@@ -1,7 +1,7 @@
 ---
 title: "Data Analysis and Visualization"
 output: github_document
-date: "Last updated: May 31, 2024"
+date: "Last updated: June 12, 2024"
 ---
 
 ```{r setup, include=FALSE}
@@ -122,7 +122,7 @@ impact_data <- impact_data %>%
 
 
 ```{r}
-lending_group_distribution <- impact_data %>%
+lending_group_baseline_distribution <- impact_data %>%
   ggplot(aes(baseline_population_kg_co2e,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")),color=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) +
@@ -134,7 +134,7 @@ lending_group_distribution <- impact_data %>%
 ```
 
 ```{r}
-development_group_distribution <- impact_data %>%
+development_group_baseline_distribution <- impact_data %>%
   ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")),color=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
@@ -146,7 +146,7 @@ development_group_distribution <- impact_data %>%
 ```
 
 ```{r}
-ggarrange(lending_group_distribution,development_group_distribution,
+ggarrange(lending_group_baseline_distribution,development_group_baseline_distribution,
           nrow=2,
           labels=c("A","B"))
 ```
@@ -197,7 +197,7 @@ ggarrange(lending_group_membership_dichotomized,development_group_membership_dic
 lending_group_distribution_dichotomized
 
 ```{r}
-lending_group_distribution_dichotomized <- impact_data %>%
+lending_group_baseline_distribution_dichotomized <- impact_data %>%
   ggplot(aes(baseline_population_kg_co2e,fill=factor(lending_group_dichotomy,levels=c("Lower","Higher","NA")),color=factor(lending_group_dichotomy,levels=c("Lower","Higher","NA")))) + 
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set2",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) +
@@ -209,7 +209,7 @@ lending_group_distribution_dichotomized <- impact_data %>%
 ```
 
 ```{r}
-development_group_distribution_dichotomized <- impact_data %>%
+development_group_baseline_distribution_dichotomized <- impact_data %>%
   ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group_dichotomy,levels=c("Global South","Global North","NA")),color=factor(development_group_dichotomy,levels=c("Global South","Global North","NA")))) + 
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set3",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) +
@@ -221,12 +221,12 @@ development_group_distribution_dichotomized <- impact_data %>%
 ```
 
 ```{r}
-ggarrange(lending_group_distribution_dichotomized,development_group_distribution_dichotomized,
+ggarrange(lending_group_baseline_distribution_dichotomized,development_group_baseline_distribution_dichotomized,
           nrow=2,
           labels=c("A","B"))
 ```
 
-## Groupwise Comparisons
+## Descriptive Results 
 
 ```{r}
 impact_data %>%
@@ -243,7 +243,6 @@ impact_data %>%
   geom_col() + 
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
 ```
-
 
 should also find which scneario greatest reduction by country - should spot check this
 
@@ -270,6 +269,87 @@ impact_data %>%
   summarize(sum(greatest_population_reduction_kg_co2e))
 ```
 estimates the total global impact if the most ideal dietary change occurred 
+
+```{r}
+impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,greatest_population_reduction_kg_co2e),y=greatest_population_reduction_kg_co2e)) +
+  geom_col(fill="black") + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
+```
+
+## Groupwise Comparisons
+
+```{r}
+impact_data %>%
+  group_by(lending_group) %>%
+  summarize(mean=mean(greatest_population_reduction_kg_co2e),sd=sd(greatest_population_reduction_kg_co2e))
+```
+
+```{r}
+impact_data %>%
+  group_by(development_group) %>%
+  summarize(mean=mean(greatest_population_reduction_kg_co2e),sd=sd(greatest_population_reduction_kg_co2e))
+```
+
+```{r}
+lending_group_reductions_optimized <- impact_data %>%
+  ggplot(aes(greatest_population_reduction_kg_co2e,fill=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")),color=factor(lending_group,levels=c("Low","Lower-Middle","Upper-Middle","High","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) +
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  xlim(-300,3000) + 
+  xlab(bquote('Optimized Annual Population-Level Reductions in Diet-Attributable Emissions (Million kg CO'[2]*'e)')) +
+  ylab("Density") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+development_group_reductions_optimized <- impact_data %>%
+  ggplot(aes(greatest_population_reduction_kg_co2e,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")),color=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) + 
+  xlim(-300,3000) +
+  xlab(bquote('Optimized Annual Population-Level Reductions in Diet-Attributable Emissions (Million kg CO'[2]*'e)')) +
+  ylab("Density") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+ggarrange(lending_group_reductions_optimized,development_group_reductions_optimized,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+```{r}
+lending_group_reductions_distribution_dichotomized <- impact_data %>%
+  ggplot(aes(greatest_population_reduction_kg_co2e,fill=factor(lending_group_dichotomy,levels=c("Lower","Higher","NA")),color=factor(lending_group_dichotomy,levels=c("Lower","Higher","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set2",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) +
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Lower (n=43)","Higher (n=77)","NA")) + 
+  xlim(-300,3000) + 
+  xlab(bquote('Optimized Annual Population-Level Reductions in Diet-Attributable Emissions (Million kg CO'[2]*'e)')) +
+  ylab("Density") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+development_group_reductions_distribution_dichotomized <- impact_data %>%
+  ggplot(aes(greatest_population_reduction_kg_co2e,fill=factor(development_group_dichotomy,levels=c("Global South","Global North","NA")),color=factor(development_group_dichotomy,levels=c("Global South","Global North","NA")))) + 
+  geom_density(alpha=0.75) +
+  scale_color_brewer(palette="Set3",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) +
+  scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Global South (n=62)","Global North (n=58)","NA")) + 
+  xlim(-300,3000) +
+  xlab(bquote('Optimized Annual Population-Level Reductions in Diet-Attributable Emissions (Million kg CO'[2]*'e)')) +
+  ylab("Density") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+ggarrange(lending_group_reductions_distribution_dichotomized,development_group_reductions_distribution_dichotomized,
+          nrow=2,
+          labels=c("A","B"))
+```
 
 
 
