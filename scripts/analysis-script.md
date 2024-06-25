@@ -418,6 +418,33 @@ impact_data %>%
     ## 9                       Australia                              3869.783
     ## 10                        Germany                              3816.081
 
+Will have to move this to the most appropriate section later, BUT, we’ll
+want to use similar code to look at how this varies across groupings
+
+``` r
+impact_data %>%
+  select(country,lending_group,greatest_population_reduction_kg_co2e) %>%
+  group_by(lending_group) %>%
+  arrange(desc(greatest_population_reduction_kg_co2e)) 
+```
+
+    ## # A tibble: 120 × 3
+    ## # Groups:   lending_group [4]
+    ##    country                        lending_group greatest_population_reduction_…¹
+    ##    <chr>                          <chr>                                    <dbl>
+    ##  1 Brazil                         Upper-Middle                            34848.
+    ##  2 China                          Upper-Middle                            21871.
+    ##  3 United States of America (the) High                                    21627.
+    ##  4 India                          Lower-Middle                            16402.
+    ##  5 Argentina                      Upper-Middle                             7551.
+    ##  6 Russidan Federation (the)      Upper-Middle                             5744.
+    ##  7 Türkiye                        Upper-Middle                             4339.
+    ##  8 Mexico                         Upper-Middle                             4321.
+    ##  9 Australia                      High                                     3870.
+    ## 10 Germany                        High                                     3816.
+    ## # … with 110 more rows, and abbreviated variable name
+    ## #   ¹​greatest_population_reduction_kg_co2e
+
 estimates the total global impact if the most ideal dietary change
 occurred
 
@@ -428,7 +455,7 @@ impact_data %>%
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-31-1.png)<!-- -->
 
 ## Groupwise Comparisons
 
@@ -493,7 +520,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 13 rows containing non-finite values (`stat_density()`).
     ## Removed 13 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -530,7 +557,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 13 rows containing non-finite values (`stat_density()`).
     ## Removed 13 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -558,133 +585,9 @@ impact_data %>%
 
 ## Global
 
-``` r
-impact_data %>% select(country)
-```
-
-    ##                                                        country
-    ## 1                                                  Afghanistan
-    ## 2                                                      Albania
-    ## 3                                                      Algeria
-    ## 4                                                    Argentina
-    ## 5                                                      Armenia
-    ## 6                                                    Australia
-    ## 7                                                      Austria
-    ## 8                                                   Azerbaijan
-    ## 9                                                     Barbados
-    ## 10                                                     Belarus
-    ## 11                                                     Belgium
-    ## 12                                                      Belize
-    ## 13                                                       Benin
-    ## 14                                      Bosnia and Herzegovina
-    ## 15                                                    Botswana
-    ## 16                                                      Brazil
-    ## 17                                                    Bulgaria
-    ## 18                                                Burkina Faso
-    ## 19                                                  Cabo Verde
-    ## 20                                                    Cambodia
-    ## 21                                                    Cameroon
-    ## 22                                                      Canada
-    ## 23                                                       Chile
-    ## 24                                                       China
-    ## 25                                                    Colombia
-    ## 26                                                 Congo (the)
-    ## 27                                                  Costa Rica
-    ## 28                                               Côte d'Ivoire
-    ## 29                                                     Croatia
-    ## 30                                                      Cyprus
-    ## 31                                                     Czechia
-    ## 32                                                     Denmark
-    ## 33                                                     Ecuador
-    ## 34                                                       Egypt
-    ## 35                                                 El Salvador
-    ## 36                                                     Estonia
-    ## 37                                                    Ethiopia
-    ## 38                                                        Fiji
-    ## 39                                                     Finland
-    ## 40                                                      France
-    ## 41                                                     Georgia
-    ## 42                                                     Germany
-    ## 43                                                       Ghana
-    ## 44                                                      Greece
-    ## 45                                                   Guatemala
-    ## 46                                                    Honduras
-    ## 47                                                   Hong Kong
-    ## 48                                                     Hungary
-    ## 49                                                     Iceland
-    ## 50                                                       India
-    ## 51                                                   Indonesia
-    ## 52                                  Iran (Islamic Republic of)
-    ## 53                                                     Ireland
-    ## 54                                                      Israel
-    ## 55                                                       Italy
-    ## 56                                                     Jamaica
-    ## 57                                                       Japan
-    ## 58                                                      Jordan
-    ## 59                                                  Kazakhstan
-    ## 60                                                       Kenya
-    ## 61                                     Korea (the Republic of)
-    ## 62                                                      Kuwait
-    ## 63                                                  Kyrgyzstan
-    ## 64                                                      Latvia
-    ## 65                                                     Lebanon
-    ## 66                                                   Lithuania
-    ## 67                                                  Luxembourg
-    ## 68                                                       Macao
-    ## 69                                                  Madagascar
-    ## 70                                                      Malawi
-    ## 71                                                    Malaysia
-    ## 72                                                    Maldives
-    ## 73                                                        Mali
-    ## 74                                                       Malta
-    ## 75                                                  Mauritania
-    ## 76                                                   Mauritius
-    ## 77                                                      Mexico
-    ## 78                                   Moldova (the Republic of)
-    ## 79                                                  Montenegro
-    ## 80                                                     Morocco
-    ## 81                                                     Namibia
-    ## 82                                                       Nepal
-    ## 83                                Netherlands (Kingdom of the)
-    ## 84                                                 New Zealand
-    ## 85                                                 Niger (the)
-    ## 86                                                      Norway
-    ## 87                                                        Oman
-    ## 88                                                    Pakistan
-    ## 89                                                      Panama
-    ## 90                                                        Peru
-    ## 91                                           Philippines (the)
-    ## 92                                                      Poland
-    ## 93                                                    Portugal
-    ## 94                                                     Romania
-    ## 95                                   Russidan Federation (the)
-    ## 96                                                      Rwanda
-    ## 97                                                Saudi Arabia
-    ## 98                                                     Senegal
-    ## 99                                                      Serbia
-    ## 100                                                   Slovakia
-    ## 101                                                   Slovenia
-    ## 102                                               South Africa
-    ## 103                                                      Spain
-    ## 104                                                  Sri Lanka
-    ## 105                                                     Sweden
-    ## 106                                                Switzerland
-    ## 107                          Tanzania (the United Republic of)
-    ## 108                                                   Thailand
-    ## 109                                                       Togo
-    ## 110                                                    Tunisia
-    ## 111                                                    Türkiye
-    ## 112                                                     Uganda
-    ## 113                                                    Ukraine
-    ## 114 United Kingdom of Great Britain and Northern Ireland (the)
-    ## 115                             United States of America (the)
-    ## 116                                                    Uruguay
-    ## 117                         Venezuela (Bolivarian Republic of)
-    ## 118                                                      Yemen
-    ## 119                                                   Zimbabwe
-    ## 120                                                     Taiwan
-
 ## Choropleths
+
+## Residual Code Chunks
 
 ``` r
 impact_data %>%

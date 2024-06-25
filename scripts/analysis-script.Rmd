@@ -304,6 +304,14 @@ impact_data %>%
   head(10)
 ```
 
+Will have to move this to the most appropriate section later, BUT, we'll want to use similar code to look at how this varies across groupings 
+
+```{r}
+impact_data %>%
+  select(country,lending_group,greatest_population_reduction_kg_co2e) %>%
+  group_by(lending_group) %>%
+  arrange(desc(greatest_population_reduction_kg_co2e)) 
+```
 
 
 estimates the total global impact if the most ideal dietary change occurred 
@@ -405,14 +413,13 @@ impact_data %>%
 
 ## Global 
 
-```{r}
-impact_data %>% select(country)
-```
 
 
 ## Choropleths
 
 
+
+## Residual Code Chunks
 
 ```{r}
 impact_data %>%
