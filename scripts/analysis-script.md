@@ -332,8 +332,37 @@ impact_data %>%
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
-should also find which scneario greatest reduction by country - should
-spot check this
+Because the average reduction across the nine arbitrarily chosen
+scenarios may not be particularly useful, we may want to, instead, look
+at the returns associated with the most impactful scenarios across the
+various nation-states included within our analysis.
+
+For now, though, let us look first at the top ten performing
+nation-states when taking the average across the scenarios.
+
+``` r
+impact_data %>%
+  mutate(mean_population_reduction_kg_co2e=(meatless_day_population_reduction_kg_co2e+low_red_meat_population_reduction_kg_co2e+no_red_meat_population_reduction_kg_co2e+no_dairy_population_reduction_kg_co2e+pescetarian_population_reduction_kg_co2e+lacto_ovo_vegetarian_population_reduction_kg_co2e+eat_lancet_population_reduction_kg_co2e+two_thirds_vegan_population_reduction_kg_co2e+vegan_population_reduction_kg_co2e)/9) %>%
+  select(country,mean_population_reduction_kg_co2e) %>%
+  arrange(desc(mean_population_reduction_kg_co2e)) %>%
+  head(10)
+```
+
+    ##                           country mean_population_reduction_kg_co2e
+    ## 1                          Brazil                         21801.285
+    ## 2  United States of America (the)                         12901.329
+    ## 3                           China                         11241.777
+    ## 4                       Argentina                          5143.211
+    ## 5       Russidan Federation (the)                          3101.148
+    ## 6                          Mexico                          2390.926
+    ## 7                       Australia                          2273.210
+    ## 8                         Türkiye                          2200.060
+    ## 9                         Germany                          2105.393
+    ## 10                         France                          2037.613
+
+As described previously, we will now run a similar set of analyses for
+the 120 included nation-states - this time, for each of their optimal
+change scenarios. - should spot check this
 
 ``` r
 impact_data <- impact_data %>%
@@ -353,6 +382,12 @@ impact_data <- impact_data %>%
                                            greatest_population_reduction_kg_co2e==vegan_population_reduction_kg_co2e~"Vegan"))
 ```
 
+With this complete, we can now calculate the “technical potential” of
+university-based dietary interventions, which is to say, the total
+reductions in diet-attributable greenhouse gas emission (represented in
+kg CO2e) if the target populations were to change their behaviors as
+intended, per Nielsen and colleagues (2024).
+
 ``` r
 impact_data %>%
   summarize(sum(greatest_population_reduction_kg_co2e))
@@ -360,6 +395,28 @@ impact_data %>%
 
     ##   sum(greatest_population_reduction_kg_co2e)
     ## 1                                     190528
+
+We can also identify the top 10 performing nation-states, as we did
+before - this time, for the optimized scenarios.
+
+``` r
+impact_data %>%
+  select(country,greatest_population_reduction_kg_co2e) %>%
+  arrange(desc(greatest_population_reduction_kg_co2e)) %>%
+  head(10)
+```
+
+    ##                           country greatest_population_reduction_kg_co2e
+    ## 1                          Brazil                             34847.789
+    ## 2                           China                             21871.238
+    ## 3  United States of America (the)                             21626.882
+    ## 4                           India                             16401.527
+    ## 5                       Argentina                              7551.042
+    ## 6       Russidan Federation (the)                              5744.411
+    ## 7                         Türkiye                              4339.457
+    ## 8                          Mexico                              4321.383
+    ## 9                       Australia                              3869.783
+    ## 10                        Germany                              3816.081
 
 estimates the total global impact if the most ideal dietary change
 occurred
@@ -371,7 +428,7 @@ impact_data %>%
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ## Groupwise Comparisons
 
@@ -436,7 +493,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 13 rows containing non-finite values (`stat_density()`).
     ## Removed 13 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -473,7 +530,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 13 rows containing non-finite values (`stat_density()`).
     ## Removed 13 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -499,6 +556,134 @@ impact_data %>%
     ## 1 Global North                1526. 3115.
     ## 2 Global South                1645. 5512.
 
+## Global
+
+``` r
+impact_data %>% select(country)
+```
+
+    ##                                                        country
+    ## 1                                                  Afghanistan
+    ## 2                                                      Albania
+    ## 3                                                      Algeria
+    ## 4                                                    Argentina
+    ## 5                                                      Armenia
+    ## 6                                                    Australia
+    ## 7                                                      Austria
+    ## 8                                                   Azerbaijan
+    ## 9                                                     Barbados
+    ## 10                                                     Belarus
+    ## 11                                                     Belgium
+    ## 12                                                      Belize
+    ## 13                                                       Benin
+    ## 14                                      Bosnia and Herzegovina
+    ## 15                                                    Botswana
+    ## 16                                                      Brazil
+    ## 17                                                    Bulgaria
+    ## 18                                                Burkina Faso
+    ## 19                                                  Cabo Verde
+    ## 20                                                    Cambodia
+    ## 21                                                    Cameroon
+    ## 22                                                      Canada
+    ## 23                                                       Chile
+    ## 24                                                       China
+    ## 25                                                    Colombia
+    ## 26                                                 Congo (the)
+    ## 27                                                  Costa Rica
+    ## 28                                               Côte d'Ivoire
+    ## 29                                                     Croatia
+    ## 30                                                      Cyprus
+    ## 31                                                     Czechia
+    ## 32                                                     Denmark
+    ## 33                                                     Ecuador
+    ## 34                                                       Egypt
+    ## 35                                                 El Salvador
+    ## 36                                                     Estonia
+    ## 37                                                    Ethiopia
+    ## 38                                                        Fiji
+    ## 39                                                     Finland
+    ## 40                                                      France
+    ## 41                                                     Georgia
+    ## 42                                                     Germany
+    ## 43                                                       Ghana
+    ## 44                                                      Greece
+    ## 45                                                   Guatemala
+    ## 46                                                    Honduras
+    ## 47                                                   Hong Kong
+    ## 48                                                     Hungary
+    ## 49                                                     Iceland
+    ## 50                                                       India
+    ## 51                                                   Indonesia
+    ## 52                                  Iran (Islamic Republic of)
+    ## 53                                                     Ireland
+    ## 54                                                      Israel
+    ## 55                                                       Italy
+    ## 56                                                     Jamaica
+    ## 57                                                       Japan
+    ## 58                                                      Jordan
+    ## 59                                                  Kazakhstan
+    ## 60                                                       Kenya
+    ## 61                                     Korea (the Republic of)
+    ## 62                                                      Kuwait
+    ## 63                                                  Kyrgyzstan
+    ## 64                                                      Latvia
+    ## 65                                                     Lebanon
+    ## 66                                                   Lithuania
+    ## 67                                                  Luxembourg
+    ## 68                                                       Macao
+    ## 69                                                  Madagascar
+    ## 70                                                      Malawi
+    ## 71                                                    Malaysia
+    ## 72                                                    Maldives
+    ## 73                                                        Mali
+    ## 74                                                       Malta
+    ## 75                                                  Mauritania
+    ## 76                                                   Mauritius
+    ## 77                                                      Mexico
+    ## 78                                   Moldova (the Republic of)
+    ## 79                                                  Montenegro
+    ## 80                                                     Morocco
+    ## 81                                                     Namibia
+    ## 82                                                       Nepal
+    ## 83                                Netherlands (Kingdom of the)
+    ## 84                                                 New Zealand
+    ## 85                                                 Niger (the)
+    ## 86                                                      Norway
+    ## 87                                                        Oman
+    ## 88                                                    Pakistan
+    ## 89                                                      Panama
+    ## 90                                                        Peru
+    ## 91                                           Philippines (the)
+    ## 92                                                      Poland
+    ## 93                                                    Portugal
+    ## 94                                                     Romania
+    ## 95                                   Russidan Federation (the)
+    ## 96                                                      Rwanda
+    ## 97                                                Saudi Arabia
+    ## 98                                                     Senegal
+    ## 99                                                      Serbia
+    ## 100                                                   Slovakia
+    ## 101                                                   Slovenia
+    ## 102                                               South Africa
+    ## 103                                                      Spain
+    ## 104                                                  Sri Lanka
+    ## 105                                                     Sweden
+    ## 106                                                Switzerland
+    ## 107                          Tanzania (the United Republic of)
+    ## 108                                                   Thailand
+    ## 109                                                       Togo
+    ## 110                                                    Tunisia
+    ## 111                                                    Türkiye
+    ## 112                                                     Uganda
+    ## 113                                                    Ukraine
+    ## 114 United Kingdom of Great Britain and Northern Ireland (the)
+    ## 115                             United States of America (the)
+    ## 116                                                    Uruguay
+    ## 117                         Venezuela (Bolivarian Republic of)
+    ## 118                                                      Yemen
+    ## 119                                                   Zimbabwe
+    ## 120                                                     Taiwan
+
 ## Choropleths
 
 ``` r
@@ -512,7 +697,7 @@ impact_data %>%
     ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
     ## ℹ Please use the `fun` argument instead.
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -522,7 +707,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -536,7 +721,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 375
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-41-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -547,7 +732,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 394
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -563,7 +748,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -583,7 +768,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -598,4 +783,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-48-1.png)<!-- -->

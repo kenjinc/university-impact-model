@@ -256,7 +256,19 @@ impact_data %>%
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
 ```
 
-should also find which scneario greatest reduction by country - should spot check this
+Because the average reduction across the nine arbitrarily chosen scenarios may not be particularly useful, we may want to, instead, look at the returns associated with the most impactful scenarios across the various nation-states included within our analysis. 
+
+For now, though, let us look first at the top ten performing nation-states when taking the average across the scenarios.
+
+```{r}
+impact_data %>%
+  mutate(mean_population_reduction_kg_co2e=(meatless_day_population_reduction_kg_co2e+low_red_meat_population_reduction_kg_co2e+no_red_meat_population_reduction_kg_co2e+no_dairy_population_reduction_kg_co2e+pescetarian_population_reduction_kg_co2e+lacto_ovo_vegetarian_population_reduction_kg_co2e+eat_lancet_population_reduction_kg_co2e+two_thirds_vegan_population_reduction_kg_co2e+vegan_population_reduction_kg_co2e)/9) %>%
+  select(country,mean_population_reduction_kg_co2e) %>%
+  arrange(desc(mean_population_reduction_kg_co2e)) %>%
+  head(10)
+```
+
+As described previously, we will now run a similar set of analyses for the 120 included nation-states - this time, for each of their optimal change scenarios. - should spot check this
 
 ```{r}
 impact_data <- impact_data %>%
@@ -276,10 +288,24 @@ impact_data <- impact_data %>%
                                            greatest_population_reduction_kg_co2e==vegan_population_reduction_kg_co2e~"Vegan"))
 ```
 
+
+With this complete, we can now calculate the "technical potential" of university-based dietary interventions, which is to say, the total reductions in diet-attributable greenhouse gas emission (represented in kg CO2e) if the target populations were to change their behaviors as intended, per Nielsen and colleagues (2024).
+
 ```{r}
 impact_data %>%
   summarize(sum(greatest_population_reduction_kg_co2e))
 ```
+We can also identify the top 10 performing nation-states, as we did before - this time, for the optimized scenarios.
+
+```{r}
+impact_data %>%
+  select(country,greatest_population_reduction_kg_co2e) %>%
+  arrange(desc(greatest_population_reduction_kg_co2e)) %>%
+  head(10)
+```
+
+
+
 estimates the total global impact if the most ideal dietary change occurred 
 
 ```{r}
@@ -376,6 +402,13 @@ impact_data %>%
   group_by(development_group_dichotomy) %>%
   summarize(mean=mean(greatest_population_reduction_kg_co2e),sd=sd(greatest_population_reduction_kg_co2e))
 ```
+
+## Global 
+
+```{r}
+impact_data %>% select(country)
+```
+
 
 ## Choropleths
 
