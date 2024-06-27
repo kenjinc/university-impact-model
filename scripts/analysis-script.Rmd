@@ -23,13 +23,16 @@ library(lazyeval)
 
 ## Data Loading
 
+Here, we load in the data in the two formats we provided at the end of our cleaning script: one suited for spatial visualization and analysis and one not. 
+
 ```{r}
 impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model.csv")
 spatial_impact_data <- read.csv("/Users/kenjinchang/github/university-impact-model/data/model-output/university-impact-model-shapefile.csv")
 ```
 
-
 ## Nation-State Inclusion 
+
+First, we will generate a figure separating the nation-states included within our analysis from those that were omitted for the various reasons cited in our cleaning script. We will eventually also have to create a complementary flow diagram documenting this exclusion process, whereby nation-states were excluded either (1) because they did not have complete dietary-footprint data across the two identified sources (i.e., publication data for Kim et al. (2020) and publication data for Semba et al. (2020)), (2) because they did not have the
 
 ```{r}
 spatial_impact_data %>%
