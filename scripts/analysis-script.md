@@ -4,6 +4,9 @@ Last updated: June 12, 2024
 
 ## Package Loading
 
+Here, we load in the various packages that will be required to support
+our analyses and the corresponding visualizations we will develop.
+
 ``` r
 library(tidyverse)
 ```
@@ -335,24 +338,64 @@ impact_data %>%
     ## 1                   0.07188393
 
 ``` r
-impact_data %>%
+lending_group_mean_percent_reduction <- impact_data %>%
   mutate(mean_population_percent_reduction_kg_co2e=(meatless_day_population_percent_reduction_kg_co2e+low_red_meat_population_percent_reduction_kg_co2e+no_red_meat_day_population_percent_reduction_kg_co2e+no_dairy_population_percent_reduction_kg_co2e+pescetarian_population_percent_reduction_kg_co2e+lacto_ovo_vegetarian_population_percent_reduction_kg_co2e+eat_lancet_population_percent_reduction_kg_co2e+two_thirds_vegan_population_percent_reduction_kg_co2e+vegan_population_percent_reduction_kg_co2e)/9) %>%
-  ggplot(aes(x=fct_reorder(country_alpha_three,mean_population_percent_reduction_kg_co2e),y=mean_population_percent_reduction_kg_co2e)) +
-  geom_col(fill="black") + 
-  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
+  ggplot(aes(x=fct_reorder(country_alpha_three,mean_population_percent_reduction_kg_co2e),y=mean_population_percent_reduction_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Average Percent-Reduction in Diet-Attributable Emissions") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
-
-![](analysis-script_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
 
 ``` r
-impact_data %>%
-  mutate(mean_population_reduction_kg_co2e=(meatless_day_population_reduction_kg_co2e+low_red_meat_population_reduction_kg_co2e+no_red_meat_population_reduction_kg_co2e+no_dairy_population_reduction_kg_co2e+pescetarian_population_reduction_kg_co2e+lacto_ovo_vegetarian_population_reduction_kg_co2e+eat_lancet_population_reduction_kg_co2e+two_thirds_vegan_population_reduction_kg_co2e+vegan_population_reduction_kg_co2e)/9) %>%
-  ggplot(aes(x=fct_reorder(country_alpha_three,mean_population_reduction_kg_co2e),y=mean_population_reduction_kg_co2e)) +
+development_group_mean_percent_reduction <- impact_data %>%
+  mutate(mean_population_percent_reduction_kg_co2e=(meatless_day_population_percent_reduction_kg_co2e+low_red_meat_population_percent_reduction_kg_co2e+no_red_meat_day_population_percent_reduction_kg_co2e+no_dairy_population_percent_reduction_kg_co2e+pescetarian_population_percent_reduction_kg_co2e+lacto_ovo_vegetarian_population_percent_reduction_kg_co2e+eat_lancet_population_percent_reduction_kg_co2e+two_thirds_vegan_population_percent_reduction_kg_co2e+vegan_population_percent_reduction_kg_co2e)/9) %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,mean_population_percent_reduction_kg_co2e),y=mean_population_percent_reduction_kg_co2e,fill=lending_group)) +
   geom_col() + 
-  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
+  xlab("Nation-State") + 
+  ylab("Average Percent-Reduction in Diet-Attributable Emissions") + 
+  scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-25-1.png)<!-- -->
+``` r
+ggarrange(lending_group_mean_percent_reduction,development_group_mean_percent_reduction,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
+
+``` r
+lending_group_mean_absolute_reduction <- impact_data %>%
+  mutate(mean_population_reduction_kg_co2e=(meatless_day_population_reduction_kg_co2e+low_red_meat_population_reduction_kg_co2e+no_red_meat_population_reduction_kg_co2e+no_dairy_population_reduction_kg_co2e+pescetarian_population_reduction_kg_co2e+lacto_ovo_vegetarian_population_reduction_kg_co2e+eat_lancet_population_reduction_kg_co2e+two_thirds_vegan_population_reduction_kg_co2e+vegan_population_reduction_kg_co2e)/9) %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,mean_population_reduction_kg_co2e),y=mean_population_reduction_kg_co2e,fill=lending_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Average Reduction in Diet-Attributable Emissions") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+development_group_mean_absolute_reduction <- impact_data %>%
+  mutate(mean_population_reduction_kg_co2e=(meatless_day_population_reduction_kg_co2e+low_red_meat_population_reduction_kg_co2e+no_red_meat_population_reduction_kg_co2e+no_dairy_population_reduction_kg_co2e+pescetarian_population_reduction_kg_co2e+lacto_ovo_vegetarian_population_reduction_kg_co2e+eat_lancet_population_reduction_kg_co2e+two_thirds_vegan_population_reduction_kg_co2e+vegan_population_reduction_kg_co2e)/9) %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,mean_population_reduction_kg_co2e),y=mean_population_reduction_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Average Reduction in Diet-Attributable Emissions") + 
+  scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+ggarrange(lending_group_mean_absolute_reduction,development_group_mean_absolute_reduction,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
 
 Because the average reduction across the nine arbitrarily chosen
 scenarios may not be particularly useful, we may want to, instead, look
@@ -468,16 +511,56 @@ impact_data %>%
     ## #   ¹​greatest_population_reduction_kg_co2e
 
 estimates the total global impact if the most ideal dietary change
-occurred
+occurred - should do same for relative change (percent reduction)
 
 ``` r
-impact_data %>%
-  ggplot(aes(x=fct_reorder(country_alpha_three,greatest_population_reduction_kg_co2e),y=greatest_population_reduction_kg_co2e)) +
-  geom_col(fill="black") + 
-  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1))
+lending_group_optimized_absolute_reduction <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,greatest_population_reduction_kg_co2e),y=greatest_population_reduction_kg_co2e,fill=lending_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Reduction in Diet-Attributable Emissions") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+``` r
+developent_group_optimized_absolute_reduction <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,greatest_population_reduction_kg_co2e),y=greatest_population_reduction_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Reduction in Diet-Attributable Emissions") + 
+  scale_fill_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+ggarrange(lending_group_optimized_absolute_reduction,developent_group_optimized_absolute_reduction,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
+
+NEXT STEP WILL BE TO LOOK AT RELATIVE CHANGE FROM OPTIMIZED SCENARIO AND
+ALSO PROBABLY MOVE DICHOTOMIZED TO LOWER SECTIONS - separate
+dichotomized from nondichotomoized
+
+scale_fill_brewer(palette=“Set2”,name=“Lending Group”,labels=c(“Low
+(n=13)”,“Lower Middle (n=30)”,“Upper Middle (n=31)”,“High
+(n=46)”,“NA”)) + scale_fill_brewer(palette=“Set3”,name=“Development
+Group”,labels=c(“Low (n=16)”,“Medium (n=16)”,“High (n=30)”,“Very High
+(n=58)”,“NA”)) +
+
+scale_fill_brewer(palette=“Set2”,name=“Lending Group”,labels=c(“Low
+(n=13)”,“Lower Middle (n=30)”,“Upper Middle (n=31)”,“High
+(n=46)”,“NA”)) + scale_fill_brewer(palette=“Set3”,name=“Development
+Group”,labels=c(“Low (n=16)”,“Medium (n=16)”,“High (n=30)”,“Very High
+(n=58)”,“NA”)) +
+
+xlab(“Nation-State”) + ylab(“Average Reduction in Diet-Attributable
+Emissions”) +
+
+theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position=“bottom”,legend.justification=“right”,legend.box.spacing=unit(0,“pt”),legend.key.size=unit(10,“pt”),panel.grid=element_blank(),panel.background=element_rect(fill=“white”),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 
 ## Groupwise Comparisons
 
@@ -542,7 +625,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 13 rows containing non-finite values (`stat_density()`).
     ## Removed 13 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -579,7 +662,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 13 rows containing non-finite values (`stat_density()`).
     ## Removed 13 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-40-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -622,7 +705,7 @@ impact_data %>%
     ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
     ## ℹ Please use the `fun` argument instead.
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -632,7 +715,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -646,7 +729,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 375
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -657,7 +740,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 394
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -673,7 +756,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-47-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -693,7 +776,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-48-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-54-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -708,4 +791,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
