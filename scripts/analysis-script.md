@@ -480,7 +480,8 @@ ggarrange(lending_group_optimized_percent_reduction,development_group_optimized_
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
-Something not adding up with relative change
+Might be good to spot check after changing percent-decrease calculation
+in cleaning script, now that vegan is not mirrored with optimal
 
 ``` r
 impact_data %>%
