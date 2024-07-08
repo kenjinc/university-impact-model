@@ -64,7 +64,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=inclusion,group=group)) +
 
 ### Enrollment Indicators
 
-To provide readers with a sense of how 
+To provide readers with a sense of how much of, we perform a series of calculations to derive a few relevant statistics to provide scale and context. These include (1) the average proportion of the national population that is between the ages of 18 and 23, (2) the average proportion of the school-aged population that is enrolled in college or university programs, (3) 
 
 ```{r}
 impact_data %>%
@@ -72,6 +72,11 @@ impact_data %>%
   summarise(mean(proportion_school_aged))
 ```
 
+```{r}
+impact_data %>%
+  select(country,proportion_school_aged_enrolled) %>%
+  summarise(mean(proportion_school_aged_enrolled))
+```
 ```{r}
 impact_data
 ```

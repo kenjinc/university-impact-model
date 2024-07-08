@@ -95,7 +95,12 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=inclusion,group=group)) +
 
 ### Enrollment Indicators
 
-To provide readers with a sense of how
+To provide readers with a sense of how much of, we perform a series of
+calculations to derive a few relevant statistics to provide scale and
+context. These include (1) the average proportion of the national
+population that is between the ages of 18 and 23, (2) the average
+proportion of the school-aged population that is enrolled in college or
+university programs, (3)
 
 ``` r
 impact_data %>%
@@ -105,6 +110,15 @@ impact_data %>%
 
     ##   mean(proportion_school_aged)
     ## 1                           NA
+
+``` r
+impact_data %>%
+  select(country,proportion_school_aged_enrolled) %>%
+  summarise(mean(proportion_school_aged_enrolled))
+```
+
+    ##   mean(proportion_school_aged_enrolled)
+    ## 1                                    NA
 
 ``` r
 impact_data
@@ -56905,7 +56919,7 @@ impact_data %>%
 
     ## Warning: Removed 24328 rows containing missing values (`geom_point()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group,levels=c(“Low”,“Medium”,“High”,“Very
 High”,“NA”)),color=factor(development_group,levels=c(“Low”,“Medium”,“High”,“Very
 High”,“NA”)))) + geom_density(alpha=0.75) +
@@ -56931,7 +56945,7 @@ spatial_impact_data %>%
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 relative
 
@@ -56946,7 +56960,7 @@ spatial_impact_data %>%
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ### Lending- and Development-Group Membership
 
@@ -57009,7 +57023,7 @@ ggarrange(lending_group_membership,development_group_membership,
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ### Technical Potential
 
@@ -57072,7 +57086,7 @@ ggarrange(lending_group_mean_percent_reduction,development_group_mean_percent_re
     ## Warning: Removed 24328 rows containing missing values (`position_stack()`).
     ## Removed 24328 rows containing missing values (`position_stack()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 lending_group_mean_absolute_reduction <- impact_data %>%
@@ -57105,7 +57119,7 @@ ggarrange(lending_group_mean_absolute_reduction,development_group_mean_absolute_
     ## Warning: Removed 24328 rows containing missing values (`position_stack()`).
     ## Removed 24328 rows containing missing values (`position_stack()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-21-1.png)<!-- --> As
+![](analysis-script_files/figure-gfm/unnamed-chunk-22-1.png)<!-- --> As
 described previously, we will now run a similar set of analyses for the
 120 included nation-states - this time, for each of their optimal change
 scenarios. - should spot check this
@@ -57222,7 +57236,7 @@ ggarrange(lending_group_optimized_absolute_reduction,development_group_optimized
     ## Warning: Removed 24328 rows containing missing values (`position_stack()`).
     ## Removed 24328 rows containing missing values (`position_stack()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
 
 ``` r
 lending_group_optimized_percent_reduction <- impact_data %>% 
@@ -57255,7 +57269,7 @@ ggarrange(lending_group_optimized_percent_reduction,development_group_optimized_
     ## Warning: Removed 24328 rows containing missing values (`position_stack()`).
     ## Removed 24328 rows containing missing values (`position_stack()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
 
 Might be good to spot check after changing percent-decrease calculation
 in cleaning script, now that vegan is not mirrored with optimal
@@ -57386,7 +57400,7 @@ ggarrange(lending_group_baseline_distribution,development_group_baseline_distrib
 
     ## Warning: Removed 75274 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-38-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -57483,7 +57497,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 99467 rows containing non-finite values (`stat_density()`).
     ## Removed 99467 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-44-1.png)<!-- --> \##
+![](analysis-script_files/figure-gfm/unnamed-chunk-45-1.png)<!-- --> \##
 Lending- and Development-Group Membership, Dichotomized
 
 ``` r
@@ -57534,7 +57548,7 @@ ggarrange(lending_group_membership_dichotomized,development_group_membership_dic
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-50-1.png)<!-- -->
 
 ## Lending- and Development-Group Distributions, Dichotomized
 
@@ -57574,7 +57588,7 @@ ggarrange(lending_group_baseline_distribution_dichotomized,development_group_bas
 
     ## Warning: Removed 75274 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-52-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -57611,7 +57625,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 99467 rows containing non-finite values (`stat_density()`).
     ## Removed 99467 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-55-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -57660,7 +57674,7 @@ impact_data %>%
 
     ## Warning: Removed 24328 rows containing non-finite values (`stat_summary()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -57674,7 +57688,7 @@ impact_data %>%
 
     ## Warning: Removed 24328 rows containing non-finite values (`stat_summary()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-59-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -57688,7 +57702,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 1100
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -57699,7 +57713,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 302
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-61-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -57715,7 +57729,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-62-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -57735,7 +57749,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-64-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -57750,4 +57764,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-64-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-65-1.png)<!-- -->
