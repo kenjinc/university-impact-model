@@ -40,7 +40,7 @@ As specified in the manuscript, we will need to generate a figure separating the
 
 We will eventually also have to create a complementary flow diagram documenting this exclusion process, whereby nation-states were excluded either (1) because they did not have complete dietary-footprint data for the nine dietary scenarios across the two identified sources (i.e., publication data for Kim et al. (2020) and publication data for Semba et al. (2020)), (2) because they did not have the ___
 
-For now, we focus on creating a choropleth map using `spatial_impact_data` indcating which and how many nation-states are being factored into our country-level and global results.
+For now, we focus on creating a choropleth map using `spatial_impact_data` indicating which and how many nation-states are being factored into our country-level and global results.
 
 ```{r}
 spatial_impact_data<- spatial_impact_data %>%
@@ -72,13 +72,15 @@ impact_data %>%
   summarise(mean(proportion_school_aged))
 ```
 
+```{r}
+impact_data
+```
+
 
 ```{r}
 impact_data %>% 
-  ggplot(aes(university_enrollment),fill=inclusion,color=inclusion) + 
-  geom_density(alpha=0.75) +
-  scale_color_brewer(palette="Purples") + 
-  scale_fill_brewer(palette="Purples") + 
+  ggplot(aes(x=university_enrollment,y=proportion_school_aged_enrolled)) + 
+  geom_point() +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")),color=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 

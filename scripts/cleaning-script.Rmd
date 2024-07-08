@@ -478,7 +478,7 @@ university_enrollment_data %>%
 
 Based on this, we can see that there are a few missing-data problems we may have to address later. 
 
-In the meantime, we can focus on constructing two new columns: (1) one that reflects total enrollment across all ISCED 6, 7, and 8 programs (i.e., `university_enrollment`), (2) another that reflects the proportion of the national population that is school aged (i.e.,`proportion_school_aged`), and (3) one that reflects the proportion of the school-aged population that is enrolled in ISCED 6, 7, or 8 programs (i.e., `proportion_school_aged_enrolled`)
+In the meantime, we can focus on constructing two new columns: (1) one that reflects total enrollment across all ISCED 6, 7, and 8 programs (i.e., `university_enrollment`), (2) another that reflects the proportion/percent of the national population that is school aged (i.e.,`proportion_school_aged`), and (3) one that reflects the proportion of the school-aged population that is enrolled in ISCED 6, 7, or 8 programs (i.e., `proportion_school_aged_enrolled`)
 
 ```{r}
 university_enrollment_data <- university_enrollment_data %>%
@@ -948,6 +948,11 @@ global_university_impact_model <- global_university_impact_model %>%
   mutate(across(country,str_replace,"Turkey","Türkiye")) %>%
   mutate(across(country,str_replace,"United Kingdom","United Kingdom of Great Britain and Northern Ireland (the)")) %>%
   mutate(across(country,str_replace,"United States of America","United States of America (the)")) 
+```
+
+```{r}
+university_impact_model %>%
+  filter(if_any(everything(),is.na))
 ```
 
 ## Writing the Final Data Files
