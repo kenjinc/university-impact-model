@@ -43,9 +43,9 @@ We will eventually also have to create a complementary flow diagram documenting 
 For now, we focus on creating a choropleth map using `spatial_impact_data` indicating which and how many nation-states are being factored into our country-level and global results.
 
 ```{r}
-spatial_impact_data<- spatial_impact_data %>%
+spatial_impact_data <- spatial_impact_data %>%
   mutate(inclusion=case_when(university_enrollment>0~"Included")) 
-impact_data<- spatial_impact_data %>%
+impact_data<- impact_data %>%
   mutate(inclusion=case_when(university_enrollment>0~"Included")) 
 ```
 
@@ -64,22 +64,46 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=inclusion,group=group)) +
 
 ### Enrollment Indicators
 
-To provide readers with a sense of how much of, we perform a series of calculations to derive a few relevant statistics to provide scale and context. These include (1) the average proportion of the national population that is between the ages of 18 and 23, (2) the average proportion of the school-aged population that is enrolled in college or university programs, (3) 
+To provide readers with a sense of  scale and context, we perform a series of calculations to derive a few relevant statistics. These include:
+
+* The mean proportion of the national population that is between the ages of 18 and 23 across the 120 included nation-states (i.e., 7.30%)
 
 ```{r}
 impact_data %>%
   select(country,proportion_school_aged) %>%
   summarise(mean(proportion_school_aged))
 ```
+* The mean proportion of the school-aged population that is thought to be enrolled in college or university programs across the 120 included nation-states (i.e., 41.50%)
 
 ```{r}
 impact_data %>%
   select(country,proportion_school_aged_enrolled) %>%
   summarise(mean(proportion_school_aged_enrolled))
 ```
+
+* The global sum of people enrolled in college and university programs across the 120 included nation-states (i.e., 168,167,205)
+
 ```{r}
-impact_data
+impact_data %>%
+  summarize(sum(university_enrollment))
 ```
+
+* The global sum of people of all ages residing in the 120 included nation-states (i.e., 6,592,823,027)
+
+```{r}
+impact_data %>%
+  summarise(sum(national_population))
+```
+
+* The proportion of that sum enrollees account for (i.e., 2.55%)
+
+```{r}
+168167205 / 6592823027
+```
+
+This final statistic, in particular, will provide us with a more complete understanding of the size and proportion of the population that the expected reductions in carbon emissions are being modeled from. 
+
+
 
 
 ```{r}
@@ -88,6 +112,7 @@ impact_data %>%
   geom_point() +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
+
 ggplot(aes(baseline_population_kg_co2e,fill=factor(development_group,levels=c("Low","Medium","High","Very High","NA")),color=factor(development_group,levels=c("Low","Medium","High","Very High","NA")))) + 
   geom_density(alpha=0.75) +
   scale_color_brewer(palette="Set3",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
@@ -103,24 +128,36 @@ absolute
 spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=university_enrollment,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
-  scale_fill_distiller(palette="Purples",na.value="white",guide=guide_colourbar(reverse=TRUE)) +
+  scale_fill_gradient(low="lavender",high="mediumpurple4",na.value="white",name="Individuals Enrolled in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top")) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+  theme(legend.key.width=unit(3,"lines"),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
-
+  scale_fill_gradient(low="palegreen",high="palegreen4",na.value="white") +
+  guides(fill=guide_colorbar(reverse=TRUE,title.position="top",title.hjust=0.5)) +
 relative 
+
+ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_reduction_kg_co2e
+,group=group)) + 
+  geom_polygon(color="black",size=0.125,alpha=0.66) + 
+  scale_fill_gradient(low="palegreen",high="palegreen4",na.value="white") +
+  guides(fill=guide_colorbar(reverse=TRUE,title.position="top",title.hjust=0.5)) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  ggtitle("Diet-Attributable Greenhouse Gas Footprint at Baseline") +
+  theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 
 ```{r}
 spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
-  scale_fill_distiller(palette="Purples",na.value="white",guide=guide_colourbar(reverse=TRUE)) +
+  scale_fill_gradient(low="lavender",high="mediumpurple4",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE)) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
-  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+  theme(legend.key.width=unit(3,"lines"),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
 ### Lending- and Development-Group Membership
