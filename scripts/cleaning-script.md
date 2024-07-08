@@ -797,7 +797,7 @@ may have to address later.
 In the meantime, we can focus on constructing two new columns: (1) one
 that reflects total enrollment across all ISCED 6, 7, and 8 programs
 (i.e., `university_enrollment`), (2) another that reflects the
-proportion/percent of the national population that is school aged
+proportion of the national population that is school aged
 (i.e.,`proportion_school_aged`), and (3) one that reflects the
 proportion of the school-aged population that is enrolled in ISCED 6, 7,
 or 8 programs (i.e., `proportion_school_aged_enrolled`)
@@ -1465,6 +1465,17 @@ this new sum of `1799366` for Taiwan.
 university_impact_model <- university_impact_model %>%
   mutate(school_aged_population=replace(school_aged_population,country=="Taiwan",1799366)) %>%
   mutate(school_aged_population_ref_year=replace(school_aged_population_ref_year,country=="Taiwan",2019))
+```
+
+With these missing-data issues addressed, we can now re-run these
+commands so that the calculations apply, too, to the recently input
+value:
+
+``` r
+university_impact_model <- university_impact_model %>%
+  mutate(university_enrollment=isced_6_enrollment+isced_7_enrollment+isced_8_enrollment) %>%
+  mutate(proportion_school_aged=school_aged_population/national_population) %>%
+  mutate(proportion_school_aged_enrolled=university_enrollment/school_aged_population)
 ```
 
 Now, of the originally identified 22 missing-data instances impacting
