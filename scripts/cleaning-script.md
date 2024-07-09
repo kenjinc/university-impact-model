@@ -1307,6 +1307,7 @@ reduction and dividing that difference by the baseline estimate).
 
 ``` r
 university_impact_model <- university_impact_model %>%
+  mutate(baseline_population_reduction_kg_co2e=baseline_population_kg_co2e-baseline_population_kg_co2e) %>%
   mutate(baseline_adjusted_population_reduction_kg_co2e=baseline_adjusted_population_kg_co2e-baseline_population_kg_co2e) %>%
   mutate(baseline_oecd_population_reduction_kg_co2e=baseline_oecd_population_kg_co2e-baseline_population_kg_co2e) %>%
   mutate(meatless_day_population_reduction_kg_co2e=meatless_day_population_kg_co2e-baseline_population_kg_co2e) %>%
@@ -1318,6 +1319,7 @@ university_impact_model <- university_impact_model %>%
   mutate(eat_lancet_population_reduction_kg_co2e=eat_lancet_population_kg_co2e-baseline_population_kg_co2e) %>%
   mutate(two_thirds_vegan_population_reduction_kg_co2e=two_thirds_vegan_population_kg_co2e-baseline_population_kg_co2e) %>%
   mutate(vegan_population_reduction_kg_co2e=vegan_population_kg_co2e-baseline_population_kg_co2e) %>%
+  mutate(baseline_population_percent_reduction_kg_co2e=baseline_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(baseline_adjusted_population_percent_reduction_kg_co2e=baseline_adjusted_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(baseline_oecd_population_percent_reduction_kg_co2e=baseline_oecd_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(meatless_day_population_percent_reduction_kg_co2e=meatless_day_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
@@ -1365,7 +1367,7 @@ university_impact_model %>%
   filter(country=="Algeria"|country=="Barbados"|country=="Belize"|country=="Benin"|country=="Fiji"|country=="Jamaica"|country=="Japan"|country=="Lebanon"|country=="Malawi"|country=="Uganda"|country=="Uruguay"|country=="Venezuela (Bolivarian Republic of)"|country=="Yemen")
 ```
 
-    ## # A tibble: 13 × 62
+    ## # A tibble: 13 × 64
     ## # Rowwise: 
     ##    country       natio…¹ natio…² schoo…³ schoo…⁴ per_c…⁵ per_c…⁶ isced…⁷ isced…⁸
     ##    <chr>           <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>
@@ -1382,7 +1384,7 @@ university_impact_model %>%
     ## 11 Uruguay        3.46e6    2019  257364    2017   15650    2018       0       0
     ## 12 Venezuela (B…  2.85e7    2019 2660784    2015   13080    2014       0       0
     ## 13 Yemen          2.92e7    2019 2877905    2014    1460    2014       0       0
-    ## # … with 53 more variables: isced_7_enrollment <dbl>, isced_7_ref_year <dbl>,
+    ## # … with 55 more variables: isced_7_enrollment <dbl>, isced_7_ref_year <dbl>,
     ## #   isced_8_enrollment <dbl>, isced_8_ref_year <dbl>,
     ## #   university_enrollment <dbl>, proportion_school_aged <dbl>,
     ## #   proportion_school_aged_enrolled <dbl>, baseline_per_capita_kg_co2e <dbl>,
@@ -1780,9 +1782,9 @@ university_impact_model %>%
   filter(if_any(everything(),is.na))
 ```
 
-    ## # A tibble: 0 × 68
+    ## # A tibble: 0 × 70
     ## # Rowwise: 
-    ## # … with 68 variables: country <chr>, national_population <dbl>,
+    ## # … with 70 variables: country <chr>, national_population <dbl>,
     ## #   national_population_ref_year <dbl>, school_aged_population <dbl>,
     ## #   school_aged_population_ref_year <dbl>, per_capita_gni <dbl>,
     ## #   per_capita_gni_ref_year <dbl>, isced_6_enrollment <dbl>,
