@@ -1307,24 +1307,24 @@ reduction and dividing that difference by the baseline estimate).
 
 ``` r
 university_impact_model <- university_impact_model %>%
-  mutate(baseline_population_reduction_kg_co2e=baseline_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(baseline_adjusted_population_reduction_kg_co2e=baseline_adjusted_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(baseline_oecd_population_reduction_kg_co2e=baseline_oecd_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(meatless_day_population_reduction_kg_co2e=meatless_day_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(low_red_meat_population_reduction_kg_co2e=low_red_meat_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(no_red_meat_population_reduction_kg_co2e=no_red_meat_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(no_dairy_population_reduction_kg_co2e=no_dairy_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(pescetarian_population_reduction_kg_co2e=pescetarian_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(lacto_ovo_vegetarian_population_reduction_kg_co2e=lacto_ovo_vegetarian_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(eat_lancet_population_reduction_kg_co2e=eat_lancet_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(two_thirds_vegan_population_reduction_kg_co2e=two_thirds_vegan_population_kg_co2e-baseline_population_kg_co2e) %>%
-  mutate(vegan_population_reduction_kg_co2e=vegan_population_kg_co2e-baseline_population_kg_co2e) %>%
+  mutate(baseline_population_reduction_kg_co2e=-(baseline_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(baseline_adjusted_population_reduction_kg_co2e=-(baseline_adjusted_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(baseline_oecd_population_reduction_kg_co2e=-(baseline_oecd_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(meatless_day_population_reduction_kg_co2e=-(meatless_day_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(low_red_meat_population_reduction_kg_co2e=-(low_red_meat_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(no_red_meat_population_reduction_kg_co2e=-(no_red_meat_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(no_dairy_population_reduction_kg_co2e=-(no_dairy_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(pescetarian_population_reduction_kg_co2e=-(pescetarian_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(lacto_ovo_vegetarian_population_reduction_kg_co2e=-(lacto_ovo_vegetarian_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(eat_lancet_population_reduction_kg_co2e=-(eat_lancet_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(two_thirds_vegan_population_reduction_kg_co2e=-(two_thirds_vegan_population_kg_co2e-baseline_population_kg_co2e)) %>%
+  mutate(vegan_population_reduction_kg_co2e=-(vegan_population_kg_co2e-baseline_population_kg_co2e)) %>%
   mutate(baseline_population_percent_reduction_kg_co2e=baseline_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(baseline_adjusted_population_percent_reduction_kg_co2e=baseline_adjusted_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(baseline_oecd_population_percent_reduction_kg_co2e=baseline_oecd_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(meatless_day_population_percent_reduction_kg_co2e=meatless_day_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(low_red_meat_population_percent_reduction_kg_co2e=low_red_meat_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
-  mutate(no_red_meat_day_population_percent_reduction_kg_co2e=no_red_meat_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
+  mutate(no_red_meat_population_percent_reduction_kg_co2e=no_red_meat_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(no_dairy_population_percent_reduction_kg_co2e=no_dairy_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(pescetarian_population_percent_reduction_kg_co2e=pescetarian_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
   mutate(lacto_ovo_vegetarian_population_percent_reduction_kg_co2e=lacto_ovo_vegetarian_population_reduction_kg_co2e/baseline_population_kg_co2e) %>%
