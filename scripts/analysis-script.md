@@ -873,29 +873,66 @@ impact_data %>%
 impact_data %>%
   select(country,lending_group,development_group,meatless_day_population_reduction_kg_co2e,low_red_meat_population_reduction_kg_co2e,no_red_meat_population_reduction_kg_co2e,no_dairy_population_reduction_kg_co2e,pescetarian_population_reduction_kg_co2e,lacto_ovo_vegetarian_population_reduction_kg_co2e,eat_lancet_population_reduction_kg_co2e,two_thirds_vegan_population_reduction_kg_co2e,vegan_population_reduction_kg_co2e) %>%
   pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value") %>%
-  ggplot(aes(x=value,y=diet,fill=diet,color=diet)) + 
-  geom_violin(draw_quantiles=0.5,adjust=150,alpha=0.5) + 
-  scale_fill_brewer(palette="Set3") + 
-  scale_color_brewer(palette="Set3") +
-  stat_summary(fun.y=mean,geom="point",shape=20,size=3,color="black",fill="white") +
-  theme(legend.position="bottom")
+  mutate(across(diet,str_replace,"meatless_day_population_reduction_kg_co2e","Meatless Day")) %>%
+  mutate(across(diet,str_replace,"low_red_meat_population_reduction_kg_co2e","Low Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_red_meat_population_reduction_kg_co2e","No Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_dairy_population_reduction_kg_co2e","No Dairy")) %>%
+  mutate(across(diet,str_replace,"pescetarian_population_reduction_kg_co2e","Pescetarian")) %>%
+  mutate(across(diet,str_replace,"lacto_ovo_vegetarian_population_reduction_kg_co2e","Lacto-Ovo Vegetarian")) %>%
+  mutate(across(diet,str_replace,"eat_lancet_population_reduction_kg_co2e","EAT-Lancet")) %>%
+  mutate(across(diet,str_replace,"two_thirds_vegan_population_reduction_kg_co2e","Two-Thirds Vegan")) %>%
+  mutate(across(diet,str_replace,"vegan_population_reduction_kg_co2e","Vegan")) %>%
+  mutate(no_unintended=case_when(value>=0~1,
+                                 value<0~0)) %>%
+  group_by(diet) %>%
+  summarise(sum(no_unintended))
 ```
 
-    ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
-    ## ℹ Please use the `fun` argument instead.
+    ## # A tibble: 9 × 2
+    ##   diet                 `sum(no_unintended)`
+    ##   <chr>                               <dbl>
+    ## 1 EAT-Lancet                             92
+    ## 2 Lacto-Ovo Vegetarian                   80
+    ## 3 Low Red Meat                           69
+    ## 4 Meatless Day                           64
+    ## 5 No Dairy                              107
+    ## 6 No Red Meat                            97
+    ## 7 Pescetarian                           117
+    ## 8 Two-Thirds Vegan                      120
+    ## 9 Vegan                                 120
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-82-1.png)<!-- -->
+mutate(development_group=case_when(development_index_score\<0.550~“Low”,
+development_index_score\>=0.550&development_index_score\<=0.699~“Medium”,
+development_index_score\>=0.700&development_index_score\<=0.799~“High”,
+development_index_score\>=0.800~“Very High”))
 
 ``` r
 impact_data %>%
   select(country,lending_group,development_group,meatless_day_population_reduction_kg_co2e,low_red_meat_population_reduction_kg_co2e,no_red_meat_population_reduction_kg_co2e,no_dairy_population_reduction_kg_co2e,pescetarian_population_reduction_kg_co2e,lacto_ovo_vegetarian_population_reduction_kg_co2e,eat_lancet_population_reduction_kg_co2e,two_thirds_vegan_population_reduction_kg_co2e,vegan_population_reduction_kg_co2e) %>%
   pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value") %>%
-  ggplot(aes(x=value,y=diet,fill=diet)) + 
-  geom_boxplot(outlier.shape=NA) + 
+  mutate(across(diet,str_replace,"meatless_day_population_reduction_kg_co2e","Meatless Day")) %>%
+  mutate(across(diet,str_replace,"low_red_meat_population_reduction_kg_co2e","Low Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_red_meat_population_reduction_kg_co2e","No Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_dairy_population_reduction_kg_co2e","No Dairy")) %>%
+  mutate(across(diet,str_replace,"pescetarian_population_reduction_kg_co2e","Pescetarian")) %>%
+  mutate(across(diet,str_replace,"lacto_ovo_vegetarian_population_reduction_kg_co2e","Lacto-Ovo Vegetarian")) %>%
+  mutate(across(diet,str_replace,"eat_lancet_population_reduction_kg_co2e","EAT-Lancet")) %>%
+  mutate(across(diet,str_replace,"two_thirds_vegan_population_reduction_kg_co2e","Two-Thirds Vegan")) %>%
+  mutate(across(diet,str_replace,"vegan_population_reduction_kg_co2e","Vegan")) %>%
+  ggplot(aes(x=value,y=fct_reorder(diet,value,.fun="mean"),fill=diet,color=diet)) + 
+  geom_violin(draw_quantiles=0.5,adjust=50,alpha=0.5) + 
+  geom_vline(xintercept=0,linetype="dashed",size=0.3) + 
+  scale_fill_brewer(palette="Paired") + 
+  scale_color_brewer(palette="Paired") +
   stat_summary(fun.y=mean,geom="point",shape=20,size=3,color="black",fill="white") +
-  coord_cartesian(xlim=c(-500000000,3000000000)) +
-  theme(legend.position="bottom")
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
+
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
+
+    ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
+    ## ℹ Please use the `fun` argument instead.
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-83-1.png)<!-- -->
 
@@ -903,23 +940,47 @@ impact_data %>%
 impact_data %>%
   select(country,lending_group,development_group,meatless_day_population_percent_reduction_kg_co2e,low_red_meat_population_percent_reduction_kg_co2e,no_red_meat_population_percent_reduction_kg_co2e,no_dairy_population_percent_reduction_kg_co2e,pescetarian_population_percent_reduction_kg_co2e,lacto_ovo_vegetarian_population_percent_reduction_kg_co2e,eat_lancet_population_percent_reduction_kg_co2e,two_thirds_vegan_population_percent_reduction_kg_co2e,vegan_population_percent_reduction_kg_co2e) %>%
   pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value" )%>%
-  ggplot(aes(x=value,y=diet,fill=diet)) + 
-  geom_boxplot(outlier.shape=NA) + 
+  mutate(across(diet,str_replace,"meatless_day_population_percent_reduction_kg_co2e","Meatless Day")) %>%
+  mutate(across(diet,str_replace,"low_red_meat_population_percent_reduction_kg_co2e","Low Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_red_meat_population_percent_reduction_kg_co2e","No Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_dairy_population_percent_reduction_kg_co2e","No Dairy")) %>%
+  mutate(across(diet,str_replace,"pescetarian_population_percent_reduction_kg_co2e","Pescetarian")) %>%
+  mutate(across(diet,str_replace,"lacto_ovo_vegetarian_population_percent_reduction_kg_co2e","Lacto-Ovo Vegetarian")) %>%
+  mutate(across(diet,str_replace,"eat_lancet_population_percent_reduction_kg_co2e","EAT-Lancet")) %>%
+  mutate(across(diet,str_replace,"two_thirds_vegan_population_percent_reduction_kg_co2e","Two-Thirds Vegan")) %>%
+  mutate(across(diet,str_replace,"vegan_population_percent_reduction_kg_co2e","Vegan")) %>%
+  ggplot(aes(x=value,y=fct_reorder(diet,value,.fun="mean"),fill=diet,color=diet)) + 
+  geom_violin(draw_quantiles=0.5,adjust=5,alpha=0.5) + 
+  geom_vline(xintercept=0,linetype="dashed",size=0.3) + 
+  scale_fill_brewer(palette="Paired") + 
+  scale_color_brewer(palette="Paired") +
   stat_summary(fun.y=mean,geom="point",shape=20,size=3,color="black",fill="white") +
-  coord_cartesian(xlim=c(-1,1)) +
-  theme(legend.position="bottom")
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-84-1.png)<!-- -->
 
 ``` r
 impact_data %>%
-  select(country,lending_group,development_group,meatless_day_population_percent_reduction_kg_co2e,low_red_meat_population_percent_reduction_kg_co2e,no_red_meat_population_percent_reduction_kg_co2e,no_dairy_population_percent_reduction_kg_co2e,pescetarian_population_percent_reduction_kg_co2e,lacto_ovo_vegetarian_population_percent_reduction_kg_co2e,eat_lancet_population_percent_reduction_kg_co2e,two_thirds_vegan_population_percent_reduction_kg_co2e,vegan_population_percent_reduction_kg_co2e) %>%
-  pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value" )%>%
-  ggplot(aes(x=value,y=diet,fill=diet)) + 
-  geom_violin() + 
+  select(country,lending_group,development_group,meatless_day_population_reduction_kg_co2e,low_red_meat_population_reduction_kg_co2e,no_red_meat_population_reduction_kg_co2e,no_dairy_population_reduction_kg_co2e,pescetarian_population_reduction_kg_co2e,lacto_ovo_vegetarian_population_reduction_kg_co2e,eat_lancet_population_reduction_kg_co2e,two_thirds_vegan_population_reduction_kg_co2e,vegan_population_reduction_kg_co2e) %>%
+  pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value") %>%
+  mutate(across(diet,str_replace,"meatless_day_population_reduction_kg_co2e","Meatless Day")) %>%
+  mutate(across(diet,str_replace,"low_red_meat_population_reduction_kg_co2e","Low Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_red_meat_population_reduction_kg_co2e","No Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_dairy_population_reduction_kg_co2e","No Dairy")) %>%
+  mutate(across(diet,str_replace,"pescetarian_population_reduction_kg_co2e","Pescetarian")) %>%
+  mutate(across(diet,str_replace,"lacto_ovo_vegetarian_population_reduction_kg_co2e","Lacto-Ovo Vegetarian")) %>%
+  mutate(across(diet,str_replace,"eat_lancet_population_reduction_kg_co2e","EAT-Lancet")) %>%
+  mutate(across(diet,str_replace,"two_thirds_vegan_population_reduction_kg_co2e","Two-Thirds Vegan")) %>%
+  mutate(across(diet,str_replace,"vegan_population_reduction_kg_co2e","Vegan")) %>%
+  ggplot(aes(x=value,y=fct_reorder(diet,value,.fun="mean"),fill=diet,color=diet)) + 
+  geom_boxplot(outlier.shape=NA,alpha=0.5) +
+  geom_vline(xintercept=0,linetype="dashed",size=0.3) + 
+  scale_fill_brewer(palette="Paired") + 
+  scale_color_brewer(palette="Paired") +
   stat_summary(fun.y=mean,geom="point",shape=20,size=3,color="black",fill="white") +
-  theme(legend.position="bottom")
+  coord_cartesian(xlim=c(-500000000,3000000000)) +
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-85-1.png)<!-- -->
@@ -928,12 +989,41 @@ impact_data %>%
 impact_data %>%
   select(country,lending_group,development_group,meatless_day_population_percent_reduction_kg_co2e,low_red_meat_population_percent_reduction_kg_co2e,no_red_meat_population_percent_reduction_kg_co2e,no_dairy_population_percent_reduction_kg_co2e,pescetarian_population_percent_reduction_kg_co2e,lacto_ovo_vegetarian_population_percent_reduction_kg_co2e,eat_lancet_population_percent_reduction_kg_co2e,two_thirds_vegan_population_percent_reduction_kg_co2e,vegan_population_percent_reduction_kg_co2e) %>%
   pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value" )%>%
-  ggplot(aes(value,fill=factor(diet,levels=c("meatless_day_population_percent_reduction_kg_co2e","low_red_meat_population_percent_reduction_kg_co2e","no_red_meat_population_percent_reduction_kg_co2e","no_dairy_population_percent_reduction_kg_co2e","pescetarian_population_percent_reduction_kg_co2e","lacto_ovo_vegetarian_population_percent_reduction_kg_co2e","eat_lancet_population_percent_reduction_kg_co2e","two_thirds_vegan_population_percent_reduction_kg_co2e","vegan_population_percent_reduction_kg_co2e")),color=factor(diet,levels=c("meatless_day_population_percent_reduction_kg_co2e","low_red_meat_population_percent_reduction_kg_co2e","no_red_meat_population_percent_reduction_kg_co2e","no_dairy_population_percent_reduction_kg_co2e","pescetarian_population_percent_reduction_kg_co2e","lacto_ovo_vegetarian_population_percent_reduction_kg_co2e","eat_lancet_population_percent_reduction_kg_co2e","two_thirds_vegan_population_percent_reduction_kg_co2e","vegan_population_percent_reduction_kg_co2e")))) + 
-  geom_density(alpha=0.4) + 
-  theme(legend.position="bottom")
+  mutate(across(diet,str_replace,"meatless_day_population_percent_reduction_kg_co2e","Meatless Day")) %>%
+  mutate(across(diet,str_replace,"low_red_meat_population_percent_reduction_kg_co2e","Low Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_red_meat_population_percent_reduction_kg_co2e","No Red Meat")) %>%
+  mutate(across(diet,str_replace,"no_dairy_population_percent_reduction_kg_co2e","No Dairy")) %>%
+  mutate(across(diet,str_replace,"pescetarian_population_percent_reduction_kg_co2e","Pescetarian")) %>%
+  mutate(across(diet,str_replace,"lacto_ovo_vegetarian_population_percent_reduction_kg_co2e","Lacto-Ovo Vegetarian")) %>%
+  mutate(across(diet,str_replace,"eat_lancet_population_percent_reduction_kg_co2e","EAT-Lancet")) %>%
+  mutate(across(diet,str_replace,"two_thirds_vegan_population_percent_reduction_kg_co2e","Two-Thirds Vegan")) %>%
+  mutate(across(diet,str_replace,"vegan_population_percent_reduction_kg_co2e","Vegan")) %>%
+  ggplot(aes(x=value,y=fct_reorder(diet,value,.fun="mean"),fill=diet,color=diet)) + 
+  geom_boxplot(outlier.shape=NA,alpha=0.5) + 
+  geom_vline(xintercept=0,linetype="dashed",size=0.3) + 
+  scale_fill_brewer(palette="Paired") + 
+  scale_color_brewer(palette="Paired") +
+  stat_summary(fun.y=mean,geom="point",shape=20,size=3,color="black",fill="white") +
+  coord_cartesian(xlim=c(-1,1)) +
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-86-1.png)<!-- -->
+
+add proportion above 0
+
+geom_point with development and lending group color designatinos
+
+``` r
+impact_data %>%
+  select(country,lending_group,development_group,meatless_day_population_percent_reduction_kg_co2e,low_red_meat_population_percent_reduction_kg_co2e,no_red_meat_population_percent_reduction_kg_co2e,no_dairy_population_percent_reduction_kg_co2e,pescetarian_population_percent_reduction_kg_co2e,lacto_ovo_vegetarian_population_percent_reduction_kg_co2e,eat_lancet_population_percent_reduction_kg_co2e,two_thirds_vegan_population_percent_reduction_kg_co2e,vegan_population_percent_reduction_kg_co2e) %>%
+  pivot_longer(cols=ends_with("kg_co2e"),names_to="diet",values_to="value" )%>%
+  ggplot(aes(value,fill=factor(diet,levels=c("meatless_day_population_percent_reduction_kg_co2e","low_red_meat_population_percent_reduction_kg_co2e","no_red_meat_population_percent_reduction_kg_co2e","no_dairy_population_percent_reduction_kg_co2e","pescetarian_population_percent_reduction_kg_co2e","lacto_ovo_vegetarian_population_percent_reduction_kg_co2e","eat_lancet_population_percent_reduction_kg_co2e","two_thirds_vegan_population_percent_reduction_kg_co2e","vegan_population_percent_reduction_kg_co2e")),color=factor(diet,levels=c("meatless_day_population_percent_reduction_kg_co2e","low_red_meat_population_percent_reduction_kg_co2e","no_red_meat_population_percent_reduction_kg_co2e","no_dairy_population_percent_reduction_kg_co2e","pescetarian_population_percent_reduction_kg_co2e","lacto_ovo_vegetarian_population_percent_reduction_kg_co2e","eat_lancet_population_percent_reduction_kg_co2e","two_thirds_vegan_population_percent_reduction_kg_co2e","vegan_population_percent_reduction_kg_co2e")))) + 
+  geom_density(alpha=0.4) + 
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-87-1.png)<!-- -->
 
 ### Optimized
 
@@ -1073,7 +1163,7 @@ ggarrange(lending_group_optimized_absolute_reduction,development_group_optimized
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-95-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-96-1.png)<!-- -->
 
 ``` r
 lending_group_optimized_percent_reduction <- impact_data %>% 
@@ -1103,7 +1193,7 @@ ggarrange(lending_group_optimized_percent_reduction,development_group_optimized_
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-98-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-99-1.png)<!-- -->
 
 Might be good to spot check after changing percent-decrease calculation
 in cleaning script, now that vegan is not mirrored with optimal
@@ -1234,7 +1324,7 @@ ggarrange(lending_group_baseline_distribution,development_group_baseline_distrib
 
     ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-103-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-104-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1327,7 +1417,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 120 rows containing non-finite values (`stat_density()`).
     ## Removed 120 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-110-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
 \## Lending- and Development-Group Membership, Dichotomized
 
 ``` r
@@ -1349,9 +1439,6 @@ lending_group_membership_dichotomized <- spatial_impact_data %>%
   labs(caption="") +
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
-
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
 
 ``` r
 impact_data %>%
@@ -1379,7 +1466,7 @@ ggarrange(lending_group_membership_dichotomized,development_group_membership_dic
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-115-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-116-1.png)<!-- -->
 
 ## Lending- and Development-Group Distributions, Dichotomized
 
@@ -1419,7 +1506,7 @@ ggarrange(lending_group_baseline_distribution_dichotomized,development_group_bas
 
     ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-118-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-119-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -1456,7 +1543,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 120 rows containing non-finite values (`stat_density()`).
     ## Removed 120 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-121-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-122-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1496,7 +1583,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-124-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-125-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1506,7 +1593,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-125-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-126-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -1520,7 +1607,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 375
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-126-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-127-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -1531,7 +1618,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 394
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-127-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-128-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -1547,7 +1634,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-128-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-129-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -1567,7 +1654,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-129-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-130-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -1582,4 +1669,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-130-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-131-1.png)<!-- -->
