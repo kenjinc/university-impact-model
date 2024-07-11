@@ -42,6 +42,10 @@ library(lazyeval)
     ## 
     ##     is_atomic, is_formula
 
+``` r
+library(patchwork)
+```
+
 # Data Loading
 
 The below code chunk loads in the data in the two formats we specified
@@ -159,23 +163,10 @@ complete understanding of the size and proportion of the population that
 the expected reductions in carbon emissions are being modeled from.
 
 ``` r
-impact_data %>% 
-  ggplot(aes(university_enrollment,proportion_school_aged_enrolled,label=country_alpha_three,color=per_capita_gni)) + 
-  geom_point() + 
-  scale_color_gradient(low="mistyrose1",high="salmon4",na.value="white",name="Per Capita \nGross National Income",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0)) +
-  geom_text(color="black",hjust=-0.15,nudge_x=0.05,alpha=0.6) +
-  xlab("College and University Enrollment") + 
-  ylab("Proportion School-Aged Enrolled") +
-  theme(legend.key.width=unit(1,"lines"),legend.position="right",legend.justification="left",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
-```
-
-![](analysis-script_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-``` r
-university_enrollment_absolute <- spatial_impact_data %>%
+university_enrollment_absolute_polygon <- spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=university_enrollment,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
-  scale_fill_gradient(low="lavender",high="darkslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
@@ -183,10 +174,10 @@ university_enrollment_absolute <- spatial_impact_data %>%
 ```
 
 ``` r
-university_enrollment_relative <- spatial_impact_data %>%
+university_enrollment_relative_polygon <- spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
-  scale_fill_gradient(low="lavender",high="darkslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
@@ -194,12 +185,76 @@ university_enrollment_relative <- spatial_impact_data %>%
 ```
 
 ``` r
-ggarrange(university_enrollment_absolute,university_enrollment_relative,
+ggarrange(university_enrollment_absolute_polygon,university_enrollment_relative_polygon,
           nrow=2,
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+university_enrollment_absolute_col <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,university_enrollment),y=university_enrollment,fill=university_enrollment)) +
+  geom_col(color="black",linewidth=0.2) +
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+university_enrollment_absolute_col_flip <- impact_data %>%
+  ggplot(aes(y=fct_reorder(country_alpha_three,university_enrollment),x=university_enrollment,fill=university_enrollment)) +
+  geom_col(color="black",linewidth=0.2) +
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+university_enrollment_relative_col <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,proportion_school_aged_enrolled),y=proportion_school_aged_enrolled,fill=proportion_school_aged_enrolled)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+university_enrollment_relative_col_flip <- impact_data %>%
+  ggplot(aes(y=fct_reorder(country_alpha_three,proportion_school_aged_enrolled),x=proportion_school_aged_enrolled,fill=proportion_school_aged_enrolled)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+university_enrollment_absolute_polygon + inset_element(university_enrollment_absolute_col_flip,-0.02,-0.05,0.26,.7, align_to="full")
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+university_enrollment_relative_polygon + inset_element(university_enrollment_relative_col_flip,-0.02,-0.05,0.26,.7, align_to="full")
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+ggarrange(university_enrollment_absolute_polygon,university_enrollment_absolute_col_flip,university_enrollment_relative_polygon,university_enrollment_relative_col_flip,
+          nrow=2,
+          ncol=2,
+          common.legend=TRUE,
+          widths=c(1,.2),
+          legend="none",
+          labels=c("A","B","C","D"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ## Lending- and Development-Group Membership
 
@@ -253,7 +308,88 @@ ggarrange(lending_group_membership,development_group_membership,
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+
+## Diet-Attributable Emissions at Baseline
+
+``` r
+lending_group_baseline_population <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_population_kg_co2e),y=baseline_population_kg_co2e,fill=lending_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+lending_group_baseline_per_capita <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_per_capita_kg_co2e),y=baseline_per_capita_kg_co2e,fill=lending_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+development_group_baseline_population <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_population_kg_co2e),y=baseline_population_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+development_group_baseline_per_capita <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_per_capita_kg_co2e),y=baseline_per_capita_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+ggarrange(lending_group_baseline_population,development_group_baseline_population,lending_group_baseline_per_capita,development_group_baseline_per_capita,
+          nrow=2,
+          ncol=2,
+          labels=c("A","B","C","D"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+
+``` r
+baseline_population <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=baseline_population_kg_co2e,group=group)) + 
+  geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
+  scale_fill_gradient(low="papayawhip",high="tomato",na.value="white",name="Population-Level Emissions",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.key.width=unit(3,"lines"),legend.position="bottom",legend.justification="center",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+baseline_per_capita <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=baseline_per_capita_kg_co2e,group=group)) + 
+  geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
+  scale_fill_gradient(low="papayawhip",high="tomato",na.value="white",name="Per Capita Emissions",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.key.width=unit(3,"lines"),legend.position="bottom",legend.justification="center",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+``` r
+ggarrange(baseline_population,baseline_per_capita,
+          nrow=2,
+          labels=c("A","B"))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
 
 ## Technical Potential
 
@@ -265,6 +401,30 @@ instead.
 For now, though, let us look at each scenario, individually.
 
 ### Meatless Day
+
+``` r
+impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,meatless_day_population_reduction_kg_co2e),y=meatless_day_population_reduction_kg_co2e,fill=meatless_day_population_reduction_kg_co2e)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("Nation-State") + 
+  ylab("Reduction in Diet-Attributable Emissions") + 
+  scale_fill_gradient2(low="coral",mid="lightyellow",high="mediumaquamarine",na.value="white",name="Reduction Potential",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+
+``` r
+impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,meatless_day_population_percent_reduction_kg_co2e),y=meatless_day_population_percent_reduction_kg_co2e,fill=meatless_day_population_percent_reduction_kg_co2e)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("Nation-State") + 
+  ylab("Reduction in Diet-Attributable Emissions") + 
+  scale_fill_gradient2(low="coral",mid="lightyellow",high="mediumaquamarine",na.value="white",name="Reduction Potential",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+![](analysis-script_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 ``` r
 lending_group_meatless_day_absolute_reduction <- impact_data %>%
@@ -313,7 +473,7 @@ ggarrange(lending_group_meatless_day_absolute_reduction,development_group_meatle
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -380,7 +540,7 @@ ggarrange(lending_group_low_red_meat_absolute_reduction,development_group_low_re
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-30-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -447,7 +607,7 @@ ggarrange(lending_group_no_red_meat_absolute_reduction,development_group_no_red_
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-37-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -514,7 +674,7 @@ ggarrange(lending_group_no_dairy_absolute_reduction,development_group_no_dairy_a
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -581,7 +741,7 @@ ggarrange(lending_group_pescetarian_absolute_reduction,development_group_pesceta
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-51-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -648,7 +808,7 @@ ggarrange(lending_group_lacto_ovo_vegetarian_absolute_reduction,development_grou
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-58-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-74-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -715,7 +875,7 @@ ggarrange(lending_group_eat_lancet_absolute_reduction,development_group_eat_lanc
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-65-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-81-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -782,7 +942,7 @@ ggarrange(lending_group_two_thirds_vegan_absolute_reduction,development_group_tw
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-72-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-88-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -849,7 +1009,7 @@ ggarrange(lending_group_vegan_absolute_reduction,development_group_vegan_absolut
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-79-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-95-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -882,24 +1042,24 @@ impact_data %>%
   mutate(across(diet,str_replace,"eat_lancet_population_reduction_kg_co2e","EAT-Lancet")) %>%
   mutate(across(diet,str_replace,"two_thirds_vegan_population_reduction_kg_co2e","Two-Thirds Vegan")) %>%
   mutate(across(diet,str_replace,"vegan_population_reduction_kg_co2e","Vegan")) %>%
-  mutate(no_unintended=case_when(value>=0~1,
+  mutate(count_zero_and_above=case_when(value>=0~1,
                                  value<0~0)) %>%
   group_by(diet) %>%
-  summarise(sum(no_unintended))
+  summarise(sum(count_zero_and_above))
 ```
 
     ## # A tibble: 9 × 2
-    ##   diet                 `sum(no_unintended)`
-    ##   <chr>                               <dbl>
-    ## 1 EAT-Lancet                             92
-    ## 2 Lacto-Ovo Vegetarian                   80
-    ## 3 Low Red Meat                           69
-    ## 4 Meatless Day                           64
-    ## 5 No Dairy                              107
-    ## 6 No Red Meat                            97
-    ## 7 Pescetarian                           117
-    ## 8 Two-Thirds Vegan                      120
-    ## 9 Vegan                                 120
+    ##   diet                 `sum(count_zero_and_above)`
+    ##   <chr>                                      <dbl>
+    ## 1 EAT-Lancet                                    92
+    ## 2 Lacto-Ovo Vegetarian                          80
+    ## 3 Low Red Meat                                  69
+    ## 4 Meatless Day                                  64
+    ## 5 No Dairy                                     107
+    ## 6 No Red Meat                                   97
+    ## 7 Pescetarian                                  117
+    ## 8 Two-Thirds Vegan                             120
+    ## 9 Vegan                                        120
 
 mutate(development_group=case_when(development_index_score\<0.550~“Low”,
 development_index_score\>=0.550&development_index_score\<=0.699~“Medium”,
@@ -934,7 +1094,7 @@ impact_data %>%
     ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
     ## ℹ Please use the `fun` argument instead.
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-83-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-99-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -958,7 +1118,7 @@ impact_data %>%
   theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-84-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-100-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -983,7 +1143,7 @@ impact_data %>%
   theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-85-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-101-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1008,7 +1168,7 @@ impact_data %>%
   theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-86-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-102-1.png)<!-- -->
 
 add proportion above 0
 
@@ -1023,7 +1183,7 @@ impact_data %>%
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-87-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-103-1.png)<!-- -->
 
 ### Optimized
 
@@ -1163,7 +1323,7 @@ ggarrange(lending_group_optimized_absolute_reduction,development_group_optimized
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-96-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-112-1.png)<!-- -->
 
 ``` r
 lending_group_optimized_percent_reduction <- impact_data %>% 
@@ -1193,7 +1353,7 @@ ggarrange(lending_group_optimized_percent_reduction,development_group_optimized_
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-99-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-115-1.png)<!-- -->
 
 Might be good to spot check after changing percent-decrease calculation
 in cleaning script, now that vegan is not mirrored with optimal
@@ -1324,7 +1484,7 @@ ggarrange(lending_group_baseline_distribution,development_group_baseline_distrib
 
     ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-104-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-120-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1417,7 +1577,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 120 rows containing non-finite values (`stat_density()`).
     ## Removed 120 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-127-1.png)<!-- -->
 \## Lending- and Development-Group Membership, Dichotomized
 
 ``` r
@@ -1466,7 +1626,7 @@ ggarrange(lending_group_membership_dichotomized,development_group_membership_dic
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-116-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-132-1.png)<!-- -->
 
 ## Lending- and Development-Group Distributions, Dichotomized
 
@@ -1506,7 +1666,7 @@ ggarrange(lending_group_baseline_distribution_dichotomized,development_group_bas
 
     ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-119-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-135-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -1543,7 +1703,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 120 rows containing non-finite values (`stat_density()`).
     ## Removed 120 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-122-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-138-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1583,7 +1743,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-125-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-141-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1593,7 +1753,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-126-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-142-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -1607,7 +1767,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 375
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-127-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-143-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -1618,7 +1778,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 394
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-128-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-144-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -1634,7 +1794,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-129-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-145-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -1654,7 +1814,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-130-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-146-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -1669,4 +1829,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-131-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-147-1.png)<!-- -->

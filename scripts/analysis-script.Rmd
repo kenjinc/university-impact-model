@@ -21,6 +21,7 @@ library(ggpubr)
 library(ggridges)
 library(forcats)
 library(lazyeval)
+library(patchwork)
 ```
 
 # Data Loading
@@ -104,21 +105,10 @@ impact_data %>%
 This final statistic, in particular, will provide us with a more complete understanding of the size and proportion of the population that the expected reductions in carbon emissions are being modeled from. 
 
 ```{r}
-impact_data %>% 
-  ggplot(aes(university_enrollment,proportion_school_aged_enrolled,label=country_alpha_three,color=per_capita_gni)) + 
-  geom_point() + 
-  scale_color_gradient(low="mistyrose1",high="salmon4",na.value="white",name="Per Capita \nGross National Income",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0)) +
-  geom_text(color="black",hjust=-0.15,nudge_x=0.05,alpha=0.6) +
-  xlab("College and University Enrollment") + 
-  ylab("Proportion School-Aged Enrolled") +
-  theme(legend.key.width=unit(1,"lines"),legend.position="right",legend.justification="left",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
-```
-
-```{r}
-university_enrollment_absolute <- spatial_impact_data %>%
+university_enrollment_absolute_polygon <- spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=university_enrollment,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
-  scale_fill_gradient(low="lavender",high="darkslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
@@ -126,10 +116,10 @@ university_enrollment_absolute <- spatial_impact_data %>%
 ```
 
 ```{r}
-university_enrollment_relative <- spatial_impact_data %>%
+university_enrollment_relative_polygon <- spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=proportion_school_aged_enrolled,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
-  scale_fill_gradient(low="lavender",high="darkslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
   xlab("") + 
   ylab("") +
   labs(caption="") +
@@ -137,9 +127,68 @@ university_enrollment_relative <- spatial_impact_data %>%
 ```
 
 ```{r}
-ggarrange(university_enrollment_absolute,university_enrollment_relative,
+ggarrange(university_enrollment_absolute_polygon,university_enrollment_relative_polygon,
           nrow=2,
           labels=c("A","B"))
+```
+
+```{r}
+university_enrollment_absolute_col <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,university_enrollment),y=university_enrollment,fill=university_enrollment)) +
+  geom_col(color="black",linewidth=0.2) +
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+university_enrollment_absolute_col_flip <- impact_data %>%
+  ggplot(aes(y=fct_reorder(country_alpha_three,university_enrollment),x=university_enrollment,fill=university_enrollment)) +
+  geom_col(color="black",linewidth=0.2) +
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Enrollment in College and University Programs",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+university_enrollment_relative_col <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,proportion_school_aged_enrolled),y=proportion_school_aged_enrolled,fill=proportion_school_aged_enrolled)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+university_enrollment_relative_col_flip <- impact_data %>%
+  ggplot(aes(y=fct_reorder(country_alpha_three,proportion_school_aged_enrolled),x=proportion_school_aged_enrolled,fill=proportion_school_aged_enrolled)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("") + 
+  ylab("") + 
+  scale_fill_gradient(low="lavender",high="lightslateblue",na.value="white",name="Proportion of School-Aged Population Enrolled",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+
+```{r}
+university_enrollment_absolute_polygon + inset_element(university_enrollment_absolute_col_flip,-0.02,-0.05,0.26,.7, align_to="full")
+```
+
+```{r}
+university_enrollment_relative_polygon + inset_element(university_enrollment_relative_col_flip,-0.02,-0.05,0.26,.7, align_to="full")
+```
+
+```{r}
+ggarrange(university_enrollment_absolute_polygon,university_enrollment_absolute_col_flip,university_enrollment_relative_polygon,university_enrollment_relative_col_flip,
+          nrow=2,
+          ncol=2,
+          common.legend=TRUE,
+          widths=c(1,.2),
+          legend="none",
+          labels=c("A","B","C","D"))
 ```
 
 ## Lending- and Development-Group Membership
@@ -182,6 +231,84 @@ ggarrange(lending_group_membership,development_group_membership,
           labels=c("A","B"))
 ```
 
+## Diet-Attributable Emissions at Baseline
+
+```{r}
+lending_group_baseline_population <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_population_kg_co2e),y=baseline_population_kg_co2e,fill=lending_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+lending_group_baseline_per_capita <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_per_capita_kg_co2e),y=baseline_per_capita_kg_co2e,fill=lending_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set2",name="Lending Group",labels=c("Low (n=13)","Lower Middle (n=30)","Upper Middle (n=31)","High (n=46)","NA")) + 
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+development_group_baseline_population <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_population_kg_co2e),y=baseline_population_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+
+```{r}
+development_group_baseline_per_capita <- impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,baseline_per_capita_kg_co2e),y=baseline_per_capita_kg_co2e,fill=development_group)) +
+  geom_col() + 
+  xlab("Nation-State") + 
+  ylab("Diet-Attributable Emissions at Baseline") + 
+  scale_fill_brewer(palette="Set3",na.value="white",name="Development Group",labels=c("Low (n=16)","Medium (n=16)","High (n=30)","Very High (n=58)","NA")) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+ggarrange(lending_group_baseline_population,development_group_baseline_population,lending_group_baseline_per_capita,development_group_baseline_per_capita,
+          nrow=2,
+          ncol=2,
+          labels=c("A","B","C","D"))
+```
+
+```{r}
+baseline_population <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=baseline_population_kg_co2e,group=group)) + 
+  geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
+  scale_fill_gradient(low="papayawhip",high="tomato",na.value="white",name="Population-Level Emissions",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.key.width=unit(3,"lines"),legend.position="bottom",legend.justification="center",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+baseline_per_capita <- spatial_impact_data %>%
+  ggplot(aes(x=long,y=lat,fill=baseline_per_capita_kg_co2e,group=group)) + 
+  geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
+  scale_fill_gradient(low="papayawhip",high="tomato",na.value="white",name="Per Capita Emissions",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.key.width=unit(3,"lines"),legend.position="bottom",legend.justification="center",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+ggarrange(baseline_population,baseline_per_capita,
+          nrow=2,
+          labels=c("A","B"))
+```
+
 ## Technical Potential
 
 Because the mean reduction across the nine dietary change scenarios may not be particularly meaningful, we may want to, instead, look at the returns associated with the scenario yielding the greatest reductions, instead.
@@ -189,6 +316,33 @@ Because the mean reduction across the nine dietary change scenarios may not be p
 For now, though, let us look at each scenario, individually.
 
 ### Meatless Day
+
+```{r}
+impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,meatless_day_population_reduction_kg_co2e),y=meatless_day_population_reduction_kg_co2e,fill=meatless_day_population_reduction_kg_co2e)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("Nation-State") + 
+  ylab("Reduction in Diet-Attributable Emissions") + 
+  scale_fill_gradient2(low="coral",mid="lightyellow",high="mediumaquamarine",na.value="white",name="Reduction Potential",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+```{r}
+impact_data %>%
+  ggplot(aes(x=fct_reorder(country_alpha_three,meatless_day_population_percent_reduction_kg_co2e),y=meatless_day_population_percent_reduction_kg_co2e,fill=meatless_day_population_percent_reduction_kg_co2e)) +
+  geom_col(color="black",linewidth=0.2) + 
+  xlab("Nation-State") + 
+  ylab("Reduction in Diet-Attributable Emissions") + 
+  scale_fill_gradient2(low="coral",mid="lightyellow",high="mediumaquamarine",na.value="white",name="Reduction Potential",guide=guide_colourbar(reverse=FALSE,title.position="top",title.hjust=0.5)) +
+  theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+```
+
+
+
+
+
+
+
 
 ```{r}
 lending_group_meatless_day_absolute_reduction <- impact_data %>%
@@ -732,10 +886,10 @@ impact_data %>%
   mutate(across(diet,str_replace,"eat_lancet_population_reduction_kg_co2e","EAT-Lancet")) %>%
   mutate(across(diet,str_replace,"two_thirds_vegan_population_reduction_kg_co2e","Two-Thirds Vegan")) %>%
   mutate(across(diet,str_replace,"vegan_population_reduction_kg_co2e","Vegan")) %>%
-  mutate(no_unintended=case_when(value>=0~1,
+  mutate(count_zero_and_above=case_when(value>=0~1,
                                  value<0~0)) %>%
   group_by(diet) %>%
-  summarise(sum(no_unintended))
+  summarise(sum(count_zero_and_above))
 ```
 mutate(development_group=case_when(development_index_score<0.550~"Low",
                                      development_index_score>=0.550&development_index_score<=0.699~"Medium",
