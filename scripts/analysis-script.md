@@ -95,9 +95,73 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=inclusion,group=group)) +
 
 ![](analysis-script_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
 
+``` r
+country_inclusion <- ggplot(spatial_impact_data,aes(x=long,y=lat,fill=inclusion,group=group)) + 
+  geom_polygon(color="black",linewidth=0.125) +
+  scale_fill_brewer(palette="Pastel2",na.value="white",name="Inclusion Outcomes",labels=c("Included (n=120)","NA")) +
+  xlab("") + 
+  ylab("") +
+  labs(caption="") +
+  theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(-15,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+ggsave("country-inclusion.png",path="/Users/kenjinchang/github/university-impact-model/figures",plot=country_inclusion,width=30,height=20,units="cm",dpi=150)
+```
+
 # Descriptive Results
 
 ## Enrollment Indicators
+
+``` r
+impact_data %>%
+  summarise(sum(school_aged_population))
+```
+
+    ##   sum(school_aged_population)
+    ## 1                   497908709
+
+``` r
+impact_data %>%
+  select(isced_6_enrollment) %>%
+  summarise(sum(isced_6_enrollment))
+```
+
+    ##   sum(isced_6_enrollment)
+    ## 1               141814287
+
+``` r
+141814287   / 168167205 
+```
+
+    ## [1] 0.8432934
+
+``` r
+impact_data %>%
+  select(isced_7_enrollment) %>%
+  summarise(sum(isced_7_enrollment))
+```
+
+    ##   sum(isced_7_enrollment)
+    ## 1                23316694
+
+``` r
+23316694 / 168167205
+```
+
+    ## [1] 0.1386518
+
+``` r
+impact_data %>%
+  select(isced_8_enrollment) %>%
+  summarise(sum(isced_8_enrollment))
+```
+
+    ##   sum(isced_8_enrollment)
+    ## 1                 3036224
+
+``` r
+3036224 / 168167205
+```
+
+    ## [1] 0.01805479
 
 To provide readers with a sense of scale and context, we perform a
 series of calculations to derive a few relevant statistics. These
@@ -163,6 +227,255 @@ complete understanding of the size and proportion of the population that
 the expected reductions in carbon emissions are being modeled from.
 
 ``` r
+impact_data %>%
+  select(country,university_enrollment) %>%
+  arrange(desc(university_enrollment))
+```
+
+    ##                                                        country
+    ## 1                                                        India
+    ## 2                                                        China
+    ## 3                               United States of America (the)
+    ## 4                                                       Brazil
+    ## 5                                                    Indonesia
+    ## 6                                                      Türkiye
+    ## 7                                                       Mexico
+    ## 8                                    Russidan Federation (the)
+    ## 9                                            Philippines (the)
+    ## 10                                                     Germany
+    ## 11                                                       Japan
+    ## 12                                  Iran (Islamic Republic of)
+    ## 13                                                       Egypt
+    ## 14                                                   Argentina
+    ## 15                                     Korea (the Republic of)
+    ## 16  United Kingdom of Great Britain and Northern Ireland (the)
+    ## 17                                                      France
+    ## 18                                                    Thailand
+    ## 19                                                        Peru
+    ## 20                                                       Italy
+    ## 21                                                    Pakistan
+    ## 22                                                    Colombia
+    ## 23                                                       Spain
+    ## 24                                                      Poland
+    ## 25                                                Saudi Arabia
+    ## 26                                                   Australia
+    ## 27                                                      Canada
+    ## 28                                                     Ukraine
+    ## 29                                                      Taiwan
+    ## 30                                                     Algeria
+    ## 31                                                     Morocco
+    ## 32                                                       Chile
+    ## 33                                Netherlands (Kingdom of the)
+    ## 34                                                    Malaysia
+    ## 35                                                South Africa
+    ## 36                                                      Greece
+    ## 37                                                  Kazakhstan
+    ## 38                                                     Ecuador
+    ## 39                                                    Ethiopia
+    ## 40                                                     Romania
+    ## 41                                                       Kenya
+    ## 42                                                     Belgium
+    ## 43                                                       Nepal
+    ## 44                                                      Sweden
+    ## 45                                                 Afghanistan
+    ## 46                                                     Austria
+    ## 47                                                    Portugal
+    ## 48                                                     Czechia
+    ## 49                                                       Ghana
+    ## 50                                                      Israel
+    ## 51                                                      Jordan
+    ## 52                                                     Belarus
+    ## 53                                                 Switzerland
+    ## 54                                                     Finland
+    ## 55                                                    Cameroon
+    ## 56                                                      Norway
+    ## 57                                                   Sri Lanka
+    ## 58                                                     Denmark
+    ## 59                                                     Hungary
+    ## 60                                                     Tunisia
+    ## 61                                                   Guatemala
+    ## 62                                                    Honduras
+    ## 63                                                      Serbia
+    ## 64                                                    Bulgaria
+    ## 65                                                   Hong Kong
+    ## 66                                                     Lebanon
+    ## 67                                                 New Zealand
+    ## 68                                                     Ireland
+    ## 69                                                    Cambodia
+    ## 70                                                  Costa Rica
+    ## 71                                                     Senegal
+    ## 72                                                  Azerbaijan
+    ## 73                                                 El Salvador
+    ## 74                                                  Kyrgyzstan
+    ## 75                                                     Croatia
+    ## 76                           Tanzania (the United Republic of)
+    ## 77                                                     Georgia
+    ## 78                                                      Panama
+    ## 79                                               Côte d'Ivoire
+    ## 80                                                    Slovakia
+    ## 81                                                  Madagascar
+    ## 82                                                     Albania
+    ## 83                                                   Lithuania
+    ## 84                                                    Zimbabwe
+    ## 85                                                        Oman
+    ## 86                                                        Togo
+    ## 87                                      Bosnia and Herzegovina
+    ## 88                                                      Kuwait
+    ## 89                                                        Mali
+    ## 90                                                     Armenia
+    ## 91                                                Burkina Faso
+    ## 92                                                      Rwanda
+    ## 93                                   Moldova (the Republic of)
+    ## 94                                                      Latvia
+    ## 95                                                    Slovenia
+    ## 96                                                 Niger (the)
+    ## 97                                                     Estonia
+    ## 98                                                      Cyprus
+    ## 99                                                 Congo (the)
+    ## 100                                                    Namibia
+    ## 101                                                   Botswana
+    ## 102                                                  Mauritius
+    ## 103                                                    Jamaica
+    ## 104                                                      Macao
+    ## 105                                                 Montenegro
+    ## 106                                                 Mauritania
+    ## 107                                                    Iceland
+    ## 108                                                      Benin
+    ## 109                                                      Malta
+    ## 110                                                 Cabo Verde
+    ## 111                                                   Maldives
+    ## 112                                                 Luxembourg
+    ## 113                         Venezuela (Bolivarian Republic of)
+    ## 114                                                     Belize
+    ## 115                                                     Uganda
+    ## 116                                                       Fiji
+    ## 117                                                     Malawi
+    ## 118                                                   Barbados
+    ## 119                                                    Uruguay
+    ## 120                                                      Yemen
+    ##     university_enrollment
+    ## 1            3.514812e+07
+    ## 2            2.689466e+07
+    ## 3            1.206316e+07
+    ## 4            8.741003e+06
+    ## 5            7.058478e+06
+    ## 6            4.791614e+06
+    ## 7            4.387183e+06
+    ## 8            4.340467e+06
+    ## 9            3.416135e+06
+    ## 10           3.127578e+06
+    ## 11           3.103068e+06
+    ## 12           2.961673e+06
+    ## 13           2.914473e+06
+    ## 14           2.513200e+06
+    ## 15           2.406768e+06
+    ## 16           2.182841e+06
+    ## 17           2.113672e+06
+    ## 18           2.064847e+06
+    ## 19           1.924373e+06
+    ## 20           1.882612e+06
+    ## 21           1.878101e+06
+    ## 22           1.721400e+06
+    ## 23           1.637440e+06
+    ## 24           1.492665e+06
+    ## 25           1.397065e+06
+    ## 26           1.359776e+06
+    ## 27           1.261189e+06
+    ## 28           1.217847e+06
+    ## 29           1.213172e+06
+    ## 30           9.960870e+05
+    ## 31           9.322710e+05
+    ## 32           9.074621e+05
+    ## 33           8.644770e+05
+    ## 34           8.196310e+05
+    ## 35           8.161730e+05
+    ## 36           7.668740e+05
+    ## 37           5.910380e+05
+    ## 38           5.900800e+05
+    ## 39           5.870150e+05
+    ## 40           5.388710e+05
+    ## 41           5.010620e+05
+    ## 42           4.928100e+05
+    ## 43           4.381770e+05
+    ## 44           4.054960e+05
+    ## 45           3.706100e+05
+    ## 46           3.549782e+05
+    ## 47           3.436130e+05
+    ## 48           3.280570e+05
+    ## 49           3.210580e+05
+    ## 50           3.152200e+05
+    ## 51           3.110860e+05
+    ## 52           3.049470e+05
+    ## 53           3.025630e+05
+    ## 54           2.945160e+05
+    ## 55           2.941690e+05
+    ## 56           2.801240e+05
+    ## 57           2.791660e+05
+    ## 58           2.753310e+05
+    ## 59           2.711140e+05
+    ## 60           2.671540e+05
+    ## 61           2.665140e+05
+    ## 62           2.570770e+05
+    ## 63           2.497710e+05
+    ## 64           2.363350e+05
+    ## 65           2.254400e+05
+    ## 66           2.211460e+05
+    ## 67           2.166528e+05
+    ## 68           2.113290e+05
+    ## 69           2.038630e+05
+    ## 70           1.949930e+05
+    ## 71           1.947090e+05
+    ## 72           1.842110e+05
+    ## 73           1.725910e+05
+    ## 74           1.672210e+05
+    ## 75           1.647750e+05
+    ## 76           1.540350e+05
+    ## 77           1.485100e+05
+    ## 78           1.465990e+05
+    ## 79           1.429300e+05
+    ## 80           1.418070e+05
+    ## 81           1.417540e+05
+    ## 82           1.348450e+05
+    ## 83           1.182870e+05
+    ## 84           1.147030e+05
+    ## 85           1.051390e+05
+    ## 86           9.005800e+04
+    ## 87           8.901600e+04
+    ## 88           8.487300e+04
+    ## 89           8.165300e+04
+    ## 90           8.146200e+04
+    ## 91           7.777000e+04
+    ## 92           6.782200e+04
+    ## 93           6.674700e+04
+    ## 94           6.668300e+04
+    ## 95           6.618100e+04
+    ## 96           6.356200e+04
+    ## 97           4.577342e+04
+    ## 98           4.252100e+04
+    ## 99           4.202900e+04
+    ## 100          4.105500e+04
+    ## 101          3.690400e+04
+    ## 102          3.529900e+04
+    ## 103          3.438100e+04
+    ## 104          3.408800e+04
+    ## 105          2.270900e+04
+    ## 106          1.900300e+04
+    ## 107          1.724700e+04
+    ## 108          1.471700e+04
+    ## 109          1.315200e+04
+    ## 110          1.142000e+04
+    ## 111          9.858000e+03
+    ## 112          6.277000e+03
+    ## 113          5.718000e+03
+    ## 114          5.383000e+03
+    ## 115          2.194000e+03
+    ## 116          1.620000e+02
+    ## 117          1.540000e+02
+    ## 118          1.330000e+02
+    ## 119          9.102809e+01
+    ## 120          6.400000e+01
+
+``` r
 university_enrollment_absolute_polygon <- spatial_impact_data %>%
   ggplot(aes(x=long,y=lat,fill=university_enrollment,group=group)) + 
   geom_polygon(color="black",linewidth=0.125,alpha=0.8) +
@@ -190,7 +503,7 @@ ggarrange(university_enrollment_absolute_polygon,university_enrollment_relative_
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
 
 ``` r
 university_enrollment_absolute_col <- impact_data %>%
@@ -236,13 +549,13 @@ university_enrollment_relative_col_flip <- impact_data %>%
 university_enrollment_absolute_polygon + inset_element(university_enrollment_absolute_col_flip,-0.02,-0.05,0.26,.7, align_to="full")
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-26-1.png)<!-- -->
 
 ``` r
 university_enrollment_relative_polygon + inset_element(university_enrollment_relative_col_flip,-0.02,-0.05,0.26,.7, align_to="full")
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-27-1.png)<!-- -->
 
 ``` r
 ggarrange(university_enrollment_absolute_polygon,university_enrollment_absolute_col_flip,university_enrollment_relative_polygon,university_enrollment_relative_col_flip,
@@ -254,7 +567,21 @@ ggarrange(university_enrollment_absolute_polygon,university_enrollment_absolute_
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-28-1.png)<!-- -->
+
+``` r
+enrollment_totals <- ggarrange(university_enrollment_absolute_polygon,university_enrollment_absolute_col_flip,
+          nrow=1,
+          ncol=2,
+          common.legend=TRUE,
+          widths=c(1,.3),
+          legend="none",
+          labels=c("a","b"))
+ggsave("enrollment-totals.png",path="/Users/kenjinchang/github/university-impact-model/figures",plot=enrollment_totals,width=69,height=35,units="cm",dpi=150)
+```
+
+theme(legend.position=“bottom”,legend.justification=“right”,legend.box.spacing=unit(-15,“pt”),legend.key.size=unit(10,“pt”),panel.grid=element_blank(),panel.background=element_rect(fill=“white”),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
+ggsave(“country-inclusion.png”,path=“/Users/kenjinchang/github/university-impact-model/figures”,plot=country_inclusion,width=30,height=20,units=“cm”,dpi=150)
 
 ## Lending- and Development-Group Membership
 
@@ -308,7 +635,7 @@ ggarrange(lending_group_membership,development_group_membership,
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-24-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
 ## Diet-Attributable Emissions at Baseline
 
@@ -359,7 +686,7 @@ ggarrange(lending_group_baseline_population,development_group_baseline_populatio
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-29-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
 
 ``` r
 baseline_population <- spatial_impact_data %>%
@@ -389,7 +716,7 @@ ggarrange(baseline_population,baseline_per_capita,
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-32-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-42-1.png)<!-- -->
 
 ## Technical Potential
 
@@ -412,7 +739,7 @@ impact_data %>%
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-33-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -424,7 +751,7 @@ impact_data %>%
   theme(axis.text.x=element_text(angle=90,vjust=0.5,hjust=1),legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
 
 ``` r
 lending_group_meatless_day_absolute_reduction <- impact_data %>%
@@ -473,7 +800,7 @@ ggarrange(lending_group_meatless_day_absolute_reduction,development_group_meatle
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-39-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-49-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -540,7 +867,7 @@ ggarrange(lending_group_low_red_meat_absolute_reduction,development_group_low_re
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-46-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-56-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -607,7 +934,7 @@ ggarrange(lending_group_no_red_meat_absolute_reduction,development_group_no_red_
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-53-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-63-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -674,7 +1001,7 @@ ggarrange(lending_group_no_dairy_absolute_reduction,development_group_no_dairy_a
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-60-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-70-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -741,7 +1068,7 @@ ggarrange(lending_group_pescetarian_absolute_reduction,development_group_pesceta
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-67-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-77-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -808,7 +1135,7 @@ ggarrange(lending_group_lacto_ovo_vegetarian_absolute_reduction,development_grou
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-74-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-84-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -875,7 +1202,7 @@ ggarrange(lending_group_eat_lancet_absolute_reduction,development_group_eat_lanc
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-81-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-91-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -942,7 +1269,7 @@ ggarrange(lending_group_two_thirds_vegan_absolute_reduction,development_group_tw
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-88-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-98-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1009,7 +1336,7 @@ ggarrange(lending_group_vegan_absolute_reduction,development_group_vegan_absolut
           labels=c("A","B","C","D"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-95-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-105-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1094,7 +1421,7 @@ impact_data %>%
     ## Warning: The `fun.y` argument of `stat_summary()` is deprecated as of ggplot2 3.3.0.
     ## ℹ Please use the `fun` argument instead.
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-99-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-109-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1118,7 +1445,7 @@ impact_data %>%
   theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-100-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-110-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1143,7 +1470,7 @@ impact_data %>%
   theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-101-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-111-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1168,7 +1495,7 @@ impact_data %>%
   theme(legend.position="none",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-102-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-112-1.png)<!-- -->
 
 add proportion above 0
 
@@ -1183,7 +1510,7 @@ impact_data %>%
   theme(legend.position="bottom",legend.justification="right",legend.box.spacing=unit(0,"pt"),legend.key.size=unit(10,"pt"),panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),legend.title=element_text(size=10),legend.text=element_text(size=10),plot.title=element_text(size=10))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-103-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-113-1.png)<!-- -->
 
 ### Optimized
 
@@ -1323,7 +1650,7 @@ ggarrange(lending_group_optimized_absolute_reduction,development_group_optimized
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-112-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-122-1.png)<!-- -->
 
 ``` r
 lending_group_optimized_percent_reduction <- impact_data %>% 
@@ -1353,7 +1680,7 @@ ggarrange(lending_group_optimized_percent_reduction,development_group_optimized_
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-115-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-125-1.png)<!-- -->
 
 Might be good to spot check after changing percent-decrease calculation
 in cleaning script, now that vegan is not mirrored with optimal
@@ -1484,7 +1811,7 @@ ggarrange(lending_group_baseline_distribution,development_group_baseline_distrib
 
     ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-120-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-130-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1577,7 +1904,7 @@ ggarrange(lending_group_reductions_optimized,development_group_reductions_optimi
     ## Warning: Removed 120 rows containing non-finite values (`stat_density()`).
     ## Removed 120 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-127-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-137-1.png)<!-- -->
 \## Lending- and Development-Group Membership, Dichotomized
 
 ``` r
@@ -1626,7 +1953,7 @@ ggarrange(lending_group_membership_dichotomized,development_group_membership_dic
           labels=c("A","B"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-132-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-142-1.png)<!-- -->
 
 ## Lending- and Development-Group Distributions, Dichotomized
 
@@ -1666,7 +1993,7 @@ ggarrange(lending_group_baseline_distribution_dichotomized,development_group_bas
 
     ## Warning: Removed 29 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-135-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-145-1.png)<!-- -->
 
 ## Groupwise Comparisons, Dichotomized
 
@@ -1703,7 +2030,7 @@ ggarrange(lending_group_reductions_distribution_dichotomized,development_group_r
     ## Warning: Removed 120 rows containing non-finite values (`stat_density()`).
     ## Removed 120 rows containing non-finite values (`stat_density()`).
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-138-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-148-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1743,7 +2070,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-141-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-151-1.png)<!-- -->
 
 ``` r
 impact_data %>%
@@ -1753,7 +2080,7 @@ impact_data %>%
   coord_flip()
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-142-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-152-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -1767,7 +2094,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=development_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 375
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-143-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-153-1.png)<!-- -->
 
 ``` r
 impact_data %>% 
@@ -1778,7 +2105,7 @@ ggplot(aes(x=baseline_population_kg_co2e,y=lending_group,fill=stat(x))) +
 
     ## Picking joint bandwidth of 394
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-144-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-154-1.png)<!-- -->
 
 ### Average Reduction
 
@@ -1794,7 +2121,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=proportion_school_aged_enrolled
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-145-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-155-1.png)<!-- -->
 
 scale_fill_gradient(alpha=0.66,name=bquote(‘Kilograms
 CO’\[2\]\*‘e’),colors=“z2”,trans=“reverse”,na.value=“white”,labels=scales::comma,breaks=c(750,1500,2250,3000,3750)) +
@@ -1814,7 +2141,7 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_percent_r
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-146-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-156-1.png)<!-- -->
 
 ``` r
 ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction_kg_co2e
@@ -1829,4 +2156,4 @@ ggplot(spatial_impact_data,aes(x=long,y=lat,fill=eat_lancet_population_reduction
   theme(legend.position="bottom",panel.grid=element_blank(),panel.background=element_rect(fill="white"),panel.border=element_rect(fill=NA),axis.text=element_blank(),axis.ticks=element_blank(),legend.key.width=unit(3.5,"cm"))
 ```
 
-![](analysis-script_files/figure-gfm/unnamed-chunk-147-1.png)<!-- -->
+![](analysis-script_files/figure-gfm/unnamed-chunk-157-1.png)<!-- -->
